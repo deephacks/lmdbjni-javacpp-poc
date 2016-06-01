@@ -187,12 +187,6 @@ public class LMDB extends org.deephacks.lmdbjni.JavaCppLmdbMapper {
  *	they're opaque pointers.
  */
 // #ifdef _WIN32
-@Namespace @Name("void") @Opaque public static class mdb_filehandle_t extends Pointer {
-    /** Empty constructor. Calls {@code super((Pointer)null)}. */
-    public mdb_filehandle_t() { super((Pointer)null); }
-    /** Pointer cast constructor. Invokes {@link Pointer#Pointer(Pointer)}. */
-    public mdb_filehandle_t(Pointer p) { super(p); }
-}
 // #else
 // #endif
 
@@ -769,7 +763,7 @@ public static class MDB_envinfo extends Pointer {
 	 * have already been opened for Write access.
 	 * @return A non-zero error value on failure and 0 on success.
 	 */
-@NoException public static native int mdb_env_copyfd(MDB_env env, mdb_filehandle_t fd);
+@NoException public static native int mdb_env_copyfd(MDB_env env, @Cast("mdb_filehandle_t") int fd);
 
 	/** \brief Copy an LMDB environment to the specified path, with options.
 	 *
@@ -813,7 +807,7 @@ public static class MDB_envinfo extends Pointer {
 	 * See #mdb_env_copy2() for options.
 	 * @return A non-zero error value on failure and 0 on success.
 	 */
-@NoException public static native int mdb_env_copyfd2(MDB_env env, mdb_filehandle_t fd, @Cast("unsigned int") int flags);
+@NoException public static native int mdb_env_copyfd2(MDB_env env, @Cast("mdb_filehandle_t") int fd, @Cast("unsigned int") int flags);
 
 	/** \brief Return statistics about the LMDB environment.
 	 *
@@ -919,7 +913,9 @@ public static class MDB_envinfo extends Pointer {
 	 *	<li>EINVAL - an invalid parameter was specified.
 	 * </ul>
 	 */
-@NoException public static native int mdb_env_get_fd(MDB_env env, @ByPtrPtr mdb_filehandle_t fd);
+@NoException public static native int mdb_env_get_fd(MDB_env env, @Cast("mdb_filehandle_t*") IntPointer fd);
+@NoException public static native int mdb_env_get_fd(MDB_env env, @Cast("mdb_filehandle_t*") IntBuffer fd);
+@NoException public static native int mdb_env_get_fd(MDB_env env, @Cast("mdb_filehandle_t*") int[] fd);
 
 	/** \brief Set the size of the memory map to use for this environment.
 	 *

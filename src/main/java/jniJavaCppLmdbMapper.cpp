@@ -447,8 +447,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
             { NULL },
             { NULL },
             { NULL },
-            { "sizeof", "me_last_pgno", "me_last_txnid", "me_mapaddr", "me_mapsize", "me_maxreaders", "me_numreaders" },
-            { "sizeof", "ms_depth", "ms_branch_pages", "ms_leaf_pages", "ms_overflow_pages", "ms_entries", "ms_psize" },
+            { "sizeof", "me_mapsize", "me_last_pgno", "me_last_txnid", "me_maxreaders", "me_numreaders", "me_mapaddr" },
+            { "sizeof", "ms_depth", "ms_branch_pages", "ms_psize", "ms_overflow_pages", "ms_entries", "ms_leaf_pages" },
             { "sizeof", "mv_size", "mv_data" },
             { NULL },
             { NULL },
@@ -476,8 +476,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
             { -1 },
             { -1 },
             { -1 },
-            { sizeof(::MDB_envinfo), offsetof(::MDB_envinfo, me_last_pgno), offsetof(::MDB_envinfo, me_last_txnid), offsetof(::MDB_envinfo, me_mapaddr), offsetof(::MDB_envinfo, me_mapsize), offsetof(::MDB_envinfo, me_maxreaders), offsetof(::MDB_envinfo, me_numreaders) },
-            { sizeof(::MDB_stat), offsetof(::MDB_stat, ms_depth), offsetof(::MDB_stat, ms_branch_pages), offsetof(::MDB_stat, ms_leaf_pages), offsetof(::MDB_stat, ms_overflow_pages), offsetof(::MDB_stat, ms_entries), offsetof(::MDB_stat, ms_psize) },
+            { sizeof(::MDB_envinfo), offsetof(::MDB_envinfo, me_mapsize), offsetof(::MDB_envinfo, me_last_pgno), offsetof(::MDB_envinfo, me_last_txnid), offsetof(::MDB_envinfo, me_maxreaders), offsetof(::MDB_envinfo, me_numreaders), offsetof(::MDB_envinfo, me_mapaddr) },
+            { sizeof(::MDB_stat), offsetof(::MDB_stat, ms_depth), offsetof(::MDB_stat, ms_branch_pages), offsetof(::MDB_stat, ms_psize), offsetof(::MDB_stat, ms_overflow_pages), offsetof(::MDB_stat, ms_entries), offsetof(::MDB_stat, ms_leaf_pages) },
             { sizeof(::MDB_val), offsetof(::MDB_val, mv_size), offsetof(::MDB_val, mv_data) },
             { -1 },
             { -1 },
@@ -703,6 +703,103 @@ JNIEXPORT void JNICALL Java_org_bytedeco_javacpp_BytePointer_allocateArray(JNIEn
     jlong rcapacity = arg0;
     JavaCPP_initPointer(env, obj, rptr, rcapacity, rptr, &JavaCPP_org_bytedeco_javacpp_BytePointer_deallocateArray);
 }
+JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_strcat(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    jobject rarg = NULL;
+    char* rptr;
+    rptr = (char*)strcat((char*)ptr0, (char*)ptr1);
+    if (rptr == (char*)ptr0) {
+        rarg = arg0;
+    } else if (rptr == (char*)ptr1) {
+        rarg = arg1;
+    } else if (rptr != NULL) {
+        rarg = JavaCPP_createPointer(env, 1);
+        if (rarg != NULL) {
+            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
+        }
+    }
+    return rarg;
+}
+JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_strchr(JNIEnv* env, jclass cls, jobject arg0, jint arg1) {
+    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    jobject rarg = NULL;
+    char* rptr;
+    rptr = (char*)strchr((char*)ptr0, arg1);
+    if (rptr == (char*)ptr0) {
+        rarg = arg0;
+    } else if (rptr != NULL) {
+        rarg = JavaCPP_createPointer(env, 1);
+        if (rarg != NULL) {
+            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
+        }
+    }
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_bytedeco_javacpp_BytePointer_strcmp(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    jint rarg = 0;
+    int rvalue = strcmp((char*)ptr0, (char*)ptr1);
+    rarg = (jint)rvalue;
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_bytedeco_javacpp_BytePointer_strcoll(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    jint rarg = 0;
+    int rvalue = strcoll((char*)ptr0, (char*)ptr1);
+    rarg = (jint)rvalue;
+    return rarg;
+}
+JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_strcpy(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    jobject rarg = NULL;
+    char* rptr;
+    rptr = (char*)strcpy((char*)ptr0, (char*)ptr1);
+    if (rptr == (char*)ptr0) {
+        rarg = arg0;
+    } else if (rptr == (char*)ptr1) {
+        rarg = arg1;
+    } else if (rptr != NULL) {
+        rarg = JavaCPP_createPointer(env, 1);
+        if (rarg != NULL) {
+            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
+        }
+    }
+    return rarg;
+}
+JNIEXPORT jlong JNICALL Java_org_bytedeco_javacpp_BytePointer_strcspn(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    jlong rarg = 0;
+    size_t rvalue = (size_t)strcspn((char*)ptr0, (char*)ptr1);
+    rarg = (jlong)rvalue;
+    return rarg;
+}
 JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_strerror(JNIEnv* env, jclass cls, jint arg0) {
     jobject rarg = NULL;
     char* rptr;
@@ -885,103 +982,6 @@ JNIEXPORT jlong JNICALL Java_org_bytedeco_javacpp_BytePointer_strxfrm(JNIEnv* en
     jlong rarg = 0;
     size_t rvalue = (size_t)strxfrm((char*)ptr0, (char*)ptr1, (size_t)arg2);
     rarg = (jlong)rvalue;
-    return rarg;
-}
-JNIEXPORT jlong JNICALL Java_org_bytedeco_javacpp_BytePointer_strcspn(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    jlong rarg = 0;
-    size_t rvalue = (size_t)strcspn((char*)ptr0, (char*)ptr1);
-    rarg = (jlong)rvalue;
-    return rarg;
-}
-JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_strcat(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    jobject rarg = NULL;
-    char* rptr;
-    rptr = (char*)strcat((char*)ptr0, (char*)ptr1);
-    if (rptr == (char*)ptr0) {
-        rarg = arg0;
-    } else if (rptr == (char*)ptr1) {
-        rarg = arg1;
-    } else if (rptr != NULL) {
-        rarg = JavaCPP_createPointer(env, 1);
-        if (rarg != NULL) {
-            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
-        }
-    }
-    return rarg;
-}
-JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_strchr(JNIEnv* env, jclass cls, jobject arg0, jint arg1) {
-    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    jobject rarg = NULL;
-    char* rptr;
-    rptr = (char*)strchr((char*)ptr0, arg1);
-    if (rptr == (char*)ptr0) {
-        rarg = arg0;
-    } else if (rptr != NULL) {
-        rarg = JavaCPP_createPointer(env, 1);
-        if (rarg != NULL) {
-            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
-        }
-    }
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_bytedeco_javacpp_BytePointer_strcmp(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    jint rarg = 0;
-    int rvalue = strcmp((char*)ptr0, (char*)ptr1);
-    rarg = (jint)rvalue;
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_bytedeco_javacpp_BytePointer_strcoll(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    jint rarg = 0;
-    int rvalue = strcoll((char*)ptr0, (char*)ptr1);
-    rarg = (jint)rvalue;
-    return rarg;
-}
-JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_strcpy(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    jobject rarg = NULL;
-    char* rptr;
-    rptr = (char*)strcpy((char*)ptr0, (char*)ptr1);
-    if (rptr == (char*)ptr0) {
-        rarg = arg0;
-    } else if (rptr == (char*)ptr1) {
-        rarg = arg1;
-    } else if (rptr != NULL) {
-        rarg = JavaCPP_createPointer(env, 1);
-        if (rarg != NULL) {
-            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
-        }
-    }
     return rarg;
 }
 JNIEXPORT jobject JNICALL Java_org_bytedeco_javacpp_BytePointer_get___3BII(JNIEnv* env, jobject obj, jbyteArray arg0, jint arg1, jint arg2) {
@@ -1761,6 +1761,45 @@ JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1assert_1func_al
     }
 }
 
+JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapsize__J(JNIEnv* env, jobject obj, jlong arg0) {
+    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
+    if (ptr == NULL) {
+        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
+        return 0;
+    }
+    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
+    ptr += position;
+    jobject rarg = obj;
+    ptr->me_mapsize = (size_t)arg0;
+    return rarg;
+}
+JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapsize__(JNIEnv* env, jobject obj) {
+    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
+    if (ptr == NULL) {
+        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
+        return 0;
+    }
+    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
+    ptr += position;
+    jlong rarg = 0;
+    size_t rvalue = (size_t)ptr->me_mapsize;
+    rarg = (jlong)rvalue;
+    return rarg;
+}
+JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_allocateArray(JNIEnv* env, jobject obj, jlong arg0) {
+    jthrowable exc = NULL;
+    try {
+        ::MDB_envinfo* rptr = new ::MDB_envinfo[arg0];
+        jlong rcapacity = arg0;
+        JavaCPP_initPointer(env, obj, rptr, rcapacity, rptr, &JavaCPP_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_deallocateArray);
+    } catch (...) {
+        exc = JavaCPP_handleException(env, 18);
+    }
+
+    if (exc != NULL) {
+        env->Throw(exc);
+    }
+}
 JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1last_1pgno__(JNIEnv* env, jobject obj) {
     ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
@@ -1786,19 +1825,6 @@ JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1
     ptr->me_last_pgno = (size_t)arg0;
     return rarg;
 }
-JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1last_1txnid__(JNIEnv* env, jobject obj) {
-    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
-    if (ptr == NULL) {
-        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
-        return 0;
-    }
-    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
-    ptr += position;
-    jlong rarg = 0;
-    size_t rvalue = (size_t)ptr->me_last_txnid;
-    rarg = (jlong)rvalue;
-    return rarg;
-}
 JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1last_1txnid__J(JNIEnv* env, jobject obj, jlong arg0) {
     ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
@@ -1811,55 +1837,7 @@ JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1
     ptr->me_last_txnid = (size_t)arg0;
     return rarg;
 }
-JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_allocateArray(JNIEnv* env, jobject obj, jlong arg0) {
-    jthrowable exc = NULL;
-    try {
-        ::MDB_envinfo* rptr = new ::MDB_envinfo[arg0];
-        jlong rcapacity = arg0;
-        JavaCPP_initPointer(env, obj, rptr, rcapacity, rptr, &JavaCPP_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_deallocateArray);
-    } catch (...) {
-        exc = JavaCPP_handleException(env, 18);
-    }
-
-    if (exc != NULL) {
-        env->Throw(exc);
-    }
-}
-JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapaddr__(JNIEnv* env, jobject obj) {
-    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
-    if (ptr == NULL) {
-        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
-        return 0;
-    }
-    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
-    ptr += position;
-    jobject rarg = NULL;
-    void* rptr;
-    rptr = ptr->me_mapaddr;
-    if (rptr != NULL) {
-        rarg = JavaCPP_createPointer(env, 0);
-        if (rarg != NULL) {
-            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
-        }
-    }
-    return rarg;
-}
-JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapaddr__Lorg_bytedeco_javacpp_Pointer_2(JNIEnv* env, jobject obj, jobject arg0) {
-    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
-    if (ptr == NULL) {
-        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
-        return 0;
-    }
-    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
-    ptr += position;
-    char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    jobject rarg = obj;
-    ptr->me_mapaddr = ptr0;
-    return rarg;
-}
-JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapsize__(JNIEnv* env, jobject obj) {
+JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1last_1txnid__(JNIEnv* env, jobject obj) {
     ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
@@ -1868,20 +1846,8 @@ JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1ma
     jlong position = env->GetLongField(obj, JavaCPP_positionFID);
     ptr += position;
     jlong rarg = 0;
-    size_t rvalue = (size_t)ptr->me_mapsize;
+    size_t rvalue = (size_t)ptr->me_last_txnid;
     rarg = (jlong)rvalue;
-    return rarg;
-}
-JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapsize__J(JNIEnv* env, jobject obj, jlong arg0) {
-    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
-    if (ptr == NULL) {
-        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
-        return 0;
-    }
-    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
-    ptr += position;
-    jobject rarg = obj;
-    ptr->me_mapsize = (size_t)arg0;
     return rarg;
 }
 JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1maxreaders__I(JNIEnv* env, jobject obj, jint arg0) {
@@ -1934,6 +1900,40 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1num
     rarg = (jint)rvalue;
     return rarg;
 }
+JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapaddr__(JNIEnv* env, jobject obj) {
+    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
+    if (ptr == NULL) {
+        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
+        return 0;
+    }
+    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
+    ptr += position;
+    jobject rarg = NULL;
+    void* rptr;
+    rptr = ptr->me_mapaddr;
+    if (rptr != NULL) {
+        rarg = JavaCPP_createPointer(env, 0);
+        if (rarg != NULL) {
+            env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
+        }
+    }
+    return rarg;
+}
+JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_me_1mapaddr__Lorg_bytedeco_javacpp_Pointer_2(JNIEnv* env, jobject obj, jobject arg0) {
+    ::MDB_envinfo* ptr = (::MDB_envinfo*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
+    if (ptr == NULL) {
+        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
+        return 0;
+    }
+    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
+    ptr += position;
+    char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    jobject rarg = obj;
+    ptr->me_mapaddr = ptr0;
+    return rarg;
+}
 JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_allocate(JNIEnv* env, jobject obj) {
     jthrowable exc = NULL;
     try {
@@ -1949,18 +1949,6 @@ JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1envinfo_allocat
     }
 }
 
-JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1depth__I(JNIEnv* env, jobject obj, jint arg0) {
-    ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
-    if (ptr == NULL) {
-        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
-        return 0;
-    }
-    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
-    ptr += position;
-    jobject rarg = obj;
-    ptr->ms_depth = (unsigned int)arg0;
-    return rarg;
-}
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1depth__(JNIEnv* env, jobject obj) {
     ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
@@ -1972,6 +1960,18 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1depth_
     jint rarg = 0;
     unsigned int rvalue = (unsigned int)ptr->ms_depth;
     rarg = (jint)rvalue;
+    return rarg;
+}
+JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1depth__I(JNIEnv* env, jobject obj, jint arg0) {
+    ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
+    if (ptr == NULL) {
+        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
+        return 0;
+    }
+    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
+    ptr += position;
+    jobject rarg = obj;
+    ptr->ms_depth = (unsigned int)arg0;
     return rarg;
 }
 JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1branch_1pages__(JNIEnv* env, jobject obj) {
@@ -1999,7 +1999,7 @@ JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1bra
     ptr->ms_branch_pages = (size_t)arg0;
     return rarg;
 }
-JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1leaf_1pages__J(JNIEnv* env, jobject obj, jlong arg0) {
+JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1psize__I(JNIEnv* env, jobject obj, jint arg0) {
     ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
@@ -2008,10 +2008,10 @@ JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1lea
     jlong position = env->GetLongField(obj, JavaCPP_positionFID);
     ptr += position;
     jobject rarg = obj;
-    ptr->ms_leaf_pages = (size_t)arg0;
+    ptr->ms_psize = (unsigned int)arg0;
     return rarg;
 }
-JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1leaf_1pages__(JNIEnv* env, jobject obj) {
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1psize__(JNIEnv* env, jobject obj) {
     ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
@@ -2019,10 +2019,24 @@ JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1leaf_
     }
     jlong position = env->GetLongField(obj, JavaCPP_positionFID);
     ptr += position;
-    jlong rarg = 0;
-    size_t rvalue = (size_t)ptr->ms_leaf_pages;
-    rarg = (jlong)rvalue;
+    jint rarg = 0;
+    unsigned int rvalue = (unsigned int)ptr->ms_psize;
+    rarg = (jint)rvalue;
     return rarg;
+}
+JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_allocateArray(JNIEnv* env, jobject obj, jlong arg0) {
+    jthrowable exc = NULL;
+    try {
+        ::MDB_stat* rptr = new ::MDB_stat[arg0];
+        jlong rcapacity = arg0;
+        JavaCPP_initPointer(env, obj, rptr, rcapacity, rptr, &JavaCPP_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_deallocateArray);
+    } catch (...) {
+        exc = JavaCPP_handleException(env, 18);
+    }
+
+    if (exc != NULL) {
+        env->Throw(exc);
+    }
 }
 JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1overflow_1pages__J(JNIEnv* env, jobject obj, jlong arg0) {
     ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
@@ -2074,20 +2088,7 @@ JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1entri
     rarg = (jlong)rvalue;
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1psize__(JNIEnv* env, jobject obj) {
-    ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
-    if (ptr == NULL) {
-        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
-        return 0;
-    }
-    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
-    ptr += position;
-    jint rarg = 0;
-    unsigned int rvalue = (unsigned int)ptr->ms_psize;
-    rarg = (jint)rvalue;
-    return rarg;
-}
-JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1psize__I(JNIEnv* env, jobject obj, jint arg0) {
+JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1leaf_1pages__J(JNIEnv* env, jobject obj, jlong arg0) {
     ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
@@ -2096,22 +2097,21 @@ JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1psi
     jlong position = env->GetLongField(obj, JavaCPP_positionFID);
     ptr += position;
     jobject rarg = obj;
-    ptr->ms_psize = (unsigned int)arg0;
+    ptr->ms_leaf_pages = (size_t)arg0;
     return rarg;
 }
-JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_allocateArray(JNIEnv* env, jobject obj, jlong arg0) {
-    jthrowable exc = NULL;
-    try {
-        ::MDB_stat* rptr = new ::MDB_stat[arg0];
-        jlong rcapacity = arg0;
-        JavaCPP_initPointer(env, obj, rptr, rcapacity, rptr, &JavaCPP_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_deallocateArray);
-    } catch (...) {
-        exc = JavaCPP_handleException(env, 18);
+JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_ms_1leaf_1pages__(JNIEnv* env, jobject obj) {
+    ::MDB_stat* ptr = (::MDB_stat*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
+    if (ptr == NULL) {
+        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
+        return 0;
     }
-
-    if (exc != NULL) {
-        env->Throw(exc);
-    }
+    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
+    ptr += position;
+    jlong rarg = 0;
+    size_t rvalue = (size_t)ptr->ms_leaf_pages;
+    rarg = (jlong)rvalue;
+    return rarg;
 }
 JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1stat_allocate(JNIEnv* env, jobject obj) {
     jthrowable exc = NULL;
@@ -2393,6 +2393,20 @@ JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1cmp_1func_alloc
     }
 }
 
+JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_allocateArray(JNIEnv* env, jobject obj, jlong arg0) {
+    jthrowable exc = NULL;
+    try {
+        ::MDB_val* rptr = new ::MDB_val[arg0];
+        jlong rcapacity = arg0;
+        JavaCPP_initPointer(env, obj, rptr, rcapacity, rptr, &JavaCPP_org_deephacks_lmdbjni_LMDB_00024MDB_1val_deallocateArray);
+    } catch (...) {
+        exc = JavaCPP_handleException(env, 18);
+    }
+
+    if (exc != NULL) {
+        env->Throw(exc);
+    }
+}
 JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_mv_1size__J(JNIEnv* env, jobject obj, jlong arg0) {
     ::MDB_val* ptr = (::MDB_val*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
@@ -2418,21 +2432,6 @@ JNIEXPORT jlong JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_mv_1size__
     rarg = (jlong)rvalue;
     return rarg;
 }
-JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_mv_1data__Lorg_bytedeco_javacpp_Pointer_2(JNIEnv* env, jobject obj, jobject arg0) {
-    ::MDB_val* ptr = (::MDB_val*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
-    if (ptr == NULL) {
-        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
-        return 0;
-    }
-    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
-    ptr += position;
-    char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    jobject rarg = obj;
-    ptr->mv_data = ptr0;
-    return rarg;
-}
 JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_mv_1data__(JNIEnv* env, jobject obj) {
     ::MDB_val* ptr = (::MDB_val*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
@@ -2452,19 +2451,20 @@ JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_mv_1data
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_allocateArray(JNIEnv* env, jobject obj, jlong arg0) {
-    jthrowable exc = NULL;
-    try {
-        ::MDB_val* rptr = new ::MDB_val[arg0];
-        jlong rcapacity = arg0;
-        JavaCPP_initPointer(env, obj, rptr, rcapacity, rptr, &JavaCPP_org_deephacks_lmdbjni_LMDB_00024MDB_1val_deallocateArray);
-    } catch (...) {
-        exc = JavaCPP_handleException(env, 18);
+JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_mv_1data__Lorg_bytedeco_javacpp_Pointer_2(JNIEnv* env, jobject obj, jobject arg0) {
+    ::MDB_val* ptr = (::MDB_val*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
+    if (ptr == NULL) {
+        env->ThrowNew(JavaCPP_getClass(env, 17), "This pointer address is NULL.");
+        return 0;
     }
-
-    if (exc != NULL) {
-        env->Throw(exc);
-    }
+    jlong position = env->GetLongField(obj, JavaCPP_positionFID);
+    ptr += position;
+    char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    jobject rarg = obj;
+    ptr->mv_data = ptr0;
+    return rarg;
 }
 JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_allocate(JNIEnv* env, jobject obj) {
     jthrowable exc = NULL;
@@ -2484,19 +2484,6 @@ JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_00024MDB_1val_allocate(JN
 
 
 
-
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_MDB_1VERSION_1FULL(JNIEnv* env, jclass cls) {
-    jint rarg = 0;
-    int rvalue = MDB_VERSION_FULL;
-    rarg = (jint)rvalue;
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_MDB_1VERSION_1STRING(JNIEnv* env, jclass cls) {
-    jint rarg = 0;
-    int rvalue = MDB_VERSION_STRING;
-    rarg = (jint)rvalue;
-    return rarg;
-}
 JNIEXPORT jobject JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1version__Lorg_bytedeco_javacpp_IntPointer_2Lorg_bytedeco_javacpp_IntPointer_2Lorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jobject arg2) {
     int* ptr0 = arg0 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jlong position0 = arg0 == NULL ? 0 : env->GetLongField(arg0, JavaCPP_positionFID);
@@ -2608,16 +2595,6 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1create__Lorg_de
     if (arg0 != NULL) env->SetLongField(arg0, JavaCPP_addressFID, ptr_to_jlong(ptr0));
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_BytePointer_2II(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jint arg3) {
-    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    jint rarg = 0;
-    int rvalue = mdb_env_open(ptr0, (const char*)ptr1, (unsigned int)arg2, (mdb_mode_t)arg3);
-    rarg = (jint)rvalue;
-    return rarg;
-}
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_lang_String_2II(JNIEnv* env, jclass cls, jobject arg0, jstring arg1, jint arg2, jint arg3) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     const char* ptr1 = JavaCPP_getStringBytes(env, arg1);
@@ -2627,13 +2604,14 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1open__Lorg_deep
     JavaCPP_releaseStringBytes(env, arg1, ptr1);
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_lang_String_2(JNIEnv* env, jclass cls, jobject arg0, jstring arg1) {
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_BytePointer_2II(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jint arg3) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    const char* ptr1 = JavaCPP_getStringBytes(env, arg1);
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
     jint rarg = 0;
-    int rvalue = mdb_env_copy(ptr0, ptr1);
+    int rvalue = mdb_env_open(ptr0, (const char*)ptr1, (unsigned int)arg2, (mdb_mode_t)arg3);
     rarg = (jint)rvalue;
-    JavaCPP_releaseStringBytes(env, arg1, ptr1);
     return rarg;
 }
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_BytePointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
@@ -2646,21 +2624,20 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy__Lorg_deep
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copyfd(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    void* ptr1 = arg1 == NULL ? NULL : (void*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jint rarg = 0;
-    int rvalue = mdb_env_copyfd(ptr0, ptr1);
-    rarg = (jint)rvalue;
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy2__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_lang_String_2I(JNIEnv* env, jclass cls, jobject arg0, jstring arg1, jint arg2) {
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_lang_String_2(JNIEnv* env, jclass cls, jobject arg0, jstring arg1) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     const char* ptr1 = JavaCPP_getStringBytes(env, arg1);
     jint rarg = 0;
-    int rvalue = mdb_env_copy2(ptr0, ptr1, (unsigned int)arg2);
+    int rvalue = mdb_env_copy(ptr0, ptr1);
     rarg = (jint)rvalue;
     JavaCPP_releaseStringBytes(env, arg1, ptr1);
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copyfd(JNIEnv* env, jclass cls, jobject arg0, jint arg1) {
+    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jint rarg = 0;
+    int rvalue = mdb_env_copyfd(ptr0, (mdb_filehandle_t)arg1);
+    rarg = (jint)rvalue;
     return rarg;
 }
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy2__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_BytePointer_2I(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2) {
@@ -2673,11 +2650,19 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy2__Lorg_dee
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copyfd2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2) {
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copy2__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_lang_String_2I(JNIEnv* env, jclass cls, jobject arg0, jstring arg1, jint arg2) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    void* ptr1 = arg1 == NULL ? NULL : (void*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    const char* ptr1 = JavaCPP_getStringBytes(env, arg1);
     jint rarg = 0;
-    int rvalue = mdb_env_copyfd2(ptr0, ptr1, (unsigned int)arg2);
+    int rvalue = mdb_env_copy2(ptr0, ptr1, (unsigned int)arg2);
+    rarg = (jint)rvalue;
+    JavaCPP_releaseStringBytes(env, arg1, ptr1);
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1copyfd2(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jint arg2) {
+    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jint rarg = 0;
+    int rvalue = mdb_env_copyfd2(ptr0, (mdb_filehandle_t)arg1, (unsigned int)arg2);
     rarg = (jint)rvalue;
     return rarg;
 }
@@ -2719,6 +2704,25 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1set_1flags(JNIE
     rarg = (jint)rvalue;
     return rarg;
 }
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2_3I(JNIEnv* env, jclass cls, jobject arg0, jintArray arg1) {
+    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    int* ptr1 = arg1 == NULL ? NULL : env->GetIntArrayElements(arg1, NULL);
+    jint rarg = 0;
+    int rvalue = mdb_env_get_flags(ptr0, (unsigned int*)ptr1);
+    rarg = (jint)rvalue;
+    if (arg1 != NULL) env->ReleaseIntArrayElements(arg1, (jint*)ptr1, 0);
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    int* ptr1 = arg1 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    jint rarg = 0;
+    int rvalue = mdb_env_get_flags(ptr0, (unsigned int*)ptr1);
+    rarg = (jint)rvalue;
+    return rarg;
+}
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_nio_IntBuffer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     int* ptr1 = arg1 == NULL ? NULL : (int*)env->GetDirectBufferAddress(arg1);
@@ -2737,41 +2741,14 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1flags__Lor
     if (arr1 != NULL) env->ReleaseIntArrayElements(arr1, (jint*)ptr1, 0);
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1path__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_PointerPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    int* ptr1 = arg1 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    void** ptr1 = arg1 == NULL ? NULL : (void**)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
     jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
     ptr1 += position1;
     jint rarg = 0;
-    int rvalue = mdb_env_get_flags(ptr0, (unsigned int*)ptr1);
+    int rvalue = mdb_env_get_path(ptr0, (const char**)ptr1);
     rarg = (jint)rvalue;
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2_3I(JNIEnv* env, jclass cls, jobject arg0, jintArray arg1) {
-    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    int* ptr1 = arg1 == NULL ? NULL : env->GetIntArrayElements(arg1, NULL);
-    jint rarg = 0;
-    int rvalue = mdb_env_get_flags(ptr0, (unsigned int*)ptr1);
-    rarg = (jint)rvalue;
-    if (arg1 != NULL) env->ReleaseIntArrayElements(arg1, (jint*)ptr1, 0);
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1path__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_nio_ByteBuffer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)env->GetDirectBufferAddress(arg1);
-    jbyteArray arr1 = NULL;
-    if (arg1 != NULL && ptr1 == NULL) {
-        arr1 = (jbyteArray)env->CallObjectMethod(arg1, JavaCPP_arrayMID);
-        if (env->ExceptionOccurred() != NULL) {
-            env->ExceptionClear();
-        } else {
-            ptr1 = arr1 == NULL ? NULL : env->GetByteArrayElements(arr1, NULL);
-        }
-    }
-    jint rarg = 0;
-    int rvalue = mdb_env_get_path(ptr0, (const char**)(arg1 == NULL ? NULL : &ptr1));
-    rarg = (jint)rvalue;
-    if (arr1 != NULL) env->ReleaseByteArrayElements(arr1, (jbyte*)ptr1, JNI_ABORT);
     return rarg;
 }
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1path__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_BytePointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
@@ -2795,23 +2772,59 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1path__Lorg
     if (arg1 != NULL) env->ReleaseByteArrayElements(arg1, (jbyte*)ptr1, JNI_ABORT);
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1path__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_PointerPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1path__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_nio_ByteBuffer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    void** ptr1 = arg1 == NULL ? NULL : (void**)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)env->GetDirectBufferAddress(arg1);
+    jbyteArray arr1 = NULL;
+    if (arg1 != NULL && ptr1 == NULL) {
+        arr1 = (jbyteArray)env->CallObjectMethod(arg1, JavaCPP_arrayMID);
+        if (env->ExceptionOccurred() != NULL) {
+            env->ExceptionClear();
+        } else {
+            ptr1 = arr1 == NULL ? NULL : env->GetByteArrayElements(arr1, NULL);
+        }
+    }
+    jint rarg = 0;
+    int rvalue = mdb_env_get_path(ptr0, (const char**)(arg1 == NULL ? NULL : &ptr1));
+    rarg = (jint)rvalue;
+    if (arr1 != NULL) env->ReleaseByteArrayElements(arr1, (jbyte*)ptr1, JNI_ABORT);
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1fd__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2_3I(JNIEnv* env, jclass cls, jobject arg0, jintArray arg1) {
+    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    int* ptr1 = arg1 == NULL ? NULL : env->GetIntArrayElements(arg1, NULL);
+    jint rarg = 0;
+    int rvalue = mdb_env_get_fd(ptr0, (mdb_filehandle_t*)ptr1);
+    rarg = (jint)rvalue;
+    if (arg1 != NULL) env->ReleaseIntArrayElements(arg1, (jint*)ptr1, 0);
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1fd__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    int* ptr1 = arg1 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
     jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
     ptr1 += position1;
     jint rarg = 0;
-    int rvalue = mdb_env_get_path(ptr0, (const char**)ptr1);
+    int rvalue = mdb_env_get_fd(ptr0, (mdb_filehandle_t*)ptr1);
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1fd(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1fd__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Ljava_nio_IntBuffer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    void* ptr1 = arg1 == NULL ? NULL : (void*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    int* ptr1 = arg1 == NULL ? NULL : (int*)env->GetDirectBufferAddress(arg1);
+    jintArray arr1 = NULL;
+    if (arg1 != NULL && ptr1 == NULL) {
+        arr1 = (jintArray)env->CallObjectMethod(arg1, JavaCPP_arrayMID);
+        if (env->ExceptionOccurred() != NULL) {
+            env->ExceptionClear();
+        } else {
+            ptr1 = arr1 == NULL ? NULL : env->GetIntArrayElements(arr1, NULL);
+        }
+    }
     jint rarg = 0;
-    int rvalue = mdb_env_get_fd(ptr0, (arg1 == NULL ? NULL : &ptr1));
+    int rvalue = mdb_env_get_fd(ptr0, (mdb_filehandle_t*)ptr1);
     rarg = (jint)rvalue;
-    if (arg1 != NULL) env->SetLongField(arg1, JavaCPP_addressFID, ptr_to_jlong(ptr1));
+    if (arr1 != NULL) env->ReleaseIntArrayElements(arr1, (jint*)ptr1, 0);
     return rarg;
 }
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1set_1mapsize(JNIEnv* env, jclass cls, jobject arg0, jlong arg1) {
@@ -2825,6 +2838,16 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1set_1maxreaders
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint rarg = 0;
     int rvalue = mdb_env_set_maxreaders(ptr0, (unsigned int)arg1);
+    rarg = (jint)rvalue;
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1maxreaders__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    int* ptr1 = arg1 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    jint rarg = 0;
+    int rvalue = mdb_env_get_maxreaders(ptr0, (unsigned int*)ptr1);
     rarg = (jint)rvalue;
     return rarg;
 }
@@ -2844,16 +2867,6 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1maxreaders
     int rvalue = mdb_env_get_maxreaders(ptr0, (unsigned int*)ptr1);
     rarg = (jint)rvalue;
     if (arr1 != NULL) env->ReleaseIntArrayElements(arr1, (jint*)ptr1, 0);
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1maxreaders__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2Lorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
-    ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    int* ptr1 = arg1 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    jint rarg = 0;
-    int rvalue = mdb_env_get_maxreaders(ptr0, (unsigned int*)ptr1);
-    rarg = (jint)rvalue;
     return rarg;
 }
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1env_1get_1maxreaders__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1env_2_3I(JNIEnv* env, jclass cls, jobject arg0, jintArray arg1) {
@@ -3031,19 +3044,6 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1open__Lorg_deep
     if (arr3 != NULL) env->ReleaseIntArrayElements(arr3, (jint*)ptr3, 0);
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2Lorg_bytedeco_javacpp_BytePointer_2ILorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jobject arg3) {
-    ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
-    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
-    ptr1 += position1;
-    int* ptr3 = arg3 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg3, JavaCPP_addressFID));
-    jlong position3 = arg3 == NULL ? 0 : env->GetLongField(arg3, JavaCPP_positionFID);
-    ptr3 += position3;
-    jint rarg = 0;
-    int rvalue = mdb_dbi_open(ptr0, (const char*)ptr1, (unsigned int)arg2, (MDB_dbi*)ptr3);
-    rarg = (jint)rvalue;
-    return rarg;
-}
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2Ljava_lang_String_2ILjava_nio_IntBuffer_2(JNIEnv* env, jclass cls, jobject arg0, jstring arg1, jint arg2, jobject arg3) {
     ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     const char* ptr1 = JavaCPP_getStringBytes(env, arg1);
@@ -3062,6 +3062,19 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1open__Lorg_deep
     rarg = (jint)rvalue;
     JavaCPP_releaseStringBytes(env, arg1, ptr1);
     if (arr3 != NULL) env->ReleaseIntArrayElements(arr3, (jint*)ptr3, 0);
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2Lorg_bytedeco_javacpp_BytePointer_2ILorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jobject arg3) {
+    ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)jlong_to_ptr(env->GetLongField(arg1, JavaCPP_addressFID));
+    jlong position1 = arg1 == NULL ? 0 : env->GetLongField(arg1, JavaCPP_positionFID);
+    ptr1 += position1;
+    int* ptr3 = arg3 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg3, JavaCPP_addressFID));
+    jlong position3 = arg3 == NULL ? 0 : env->GetLongField(arg3, JavaCPP_positionFID);
+    ptr3 += position3;
+    jint rarg = 0;
+    int rvalue = mdb_dbi_open(ptr0, (const char*)ptr1, (unsigned int)arg2, (MDB_dbi*)ptr3);
+    rarg = (jint)rvalue;
     return rarg;
 }
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1stat(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
@@ -3092,15 +3105,6 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1flags__Lorg_dee
     if (arr2 != NULL) env->ReleaseIntArrayElements(arr2, (jint*)ptr2, 0);
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2I_3I(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jintArray arg2) {
-    ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    int* ptr2 = arg2 == NULL ? NULL : env->GetIntArrayElements(arg2, NULL);
-    jint rarg = 0;
-    int rvalue = mdb_dbi_flags(ptr0, (MDB_dbi)arg1, (unsigned int*)ptr2);
-    rarg = (jint)rvalue;
-    if (arg2 != NULL) env->ReleaseIntArrayElements(arg2, (jint*)ptr2, 0);
-    return rarg;
-}
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2ILorg_bytedeco_javacpp_IntPointer_2(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     int* ptr2 = arg2 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
@@ -3111,9 +3115,30 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1flags__Lorg_dee
     rarg = (jint)rvalue;
     return rarg;
 }
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1flags__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2I_3I(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jintArray arg2) {
+    ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    int* ptr2 = arg2 == NULL ? NULL : env->GetIntArrayElements(arg2, NULL);
+    jint rarg = 0;
+    int rvalue = mdb_dbi_flags(ptr0, (MDB_dbi)arg1, (unsigned int*)ptr2);
+    rarg = (jint)rvalue;
+    if (arg2 != NULL) env->ReleaseIntArrayElements(arg2, (jint*)ptr2, 0);
+    return rarg;
+}
 JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1dbi_1close(JNIEnv* env, jclass cls, jobject arg0, jint arg1) {
     ::MDB_env* ptr0 = arg0 == NULL ? NULL : (::MDB_env*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     mdb_dbi_close(ptr0, (MDB_dbi)arg1);
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_MDB_1VERSION_1FULL(JNIEnv* env, jclass cls) {
+    jint rarg = 0;
+    int rvalue = MDB_VERSION_FULL;
+    rarg = (jint)rvalue;
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_MDB_1VERSION_1STRING(JNIEnv* env, jclass cls) {
+    jint rarg = 0;
+    int rvalue = MDB_VERSION_STRING;
+    rarg = (jint)rvalue;
+    return rarg;
 }
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1drop(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jint arg2) {
     ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
@@ -3201,6 +3226,15 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1del(JNIEnv* env, jcl
     rarg = (jint)rvalue;
     return rarg;
 }
+JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1cursor_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2ILorg_deephacks_lmdbjni_LMDB_00024MDB_1cursor_2(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+    ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    ::MDB_cursor* ptr2 = arg2 == NULL ? NULL : (::MDB_cursor*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
+    jint rarg = 0;
+    int rvalue = mdb_cursor_open(ptr0, (MDB_dbi)arg1, (arg2 == NULL ? NULL : &ptr2));
+    rarg = (jint)rvalue;
+    if (arg2 != NULL) env->SetLongField(arg2, JavaCPP_addressFID, ptr_to_jlong(ptr2));
+    return rarg;
+}
 JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1cursor_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2ILorg_bytedeco_javacpp_PointerPointer_2(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     void** ptr2 = arg2 == NULL ? NULL : (void**)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
@@ -3209,15 +3243,6 @@ JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1cursor_1open__Lorg_d
     jint rarg = 0;
     int rvalue = mdb_cursor_open(ptr0, (MDB_dbi)arg1, (MDB_cursor**)ptr2);
     rarg = (jint)rvalue;
-    return rarg;
-}
-JNIEXPORT jint JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1cursor_1open__Lorg_deephacks_lmdbjni_LMDB_00024MDB_1txn_2ILorg_deephacks_lmdbjni_LMDB_00024MDB_1cursor_2(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
-    ::MDB_txn* ptr0 = arg0 == NULL ? NULL : (::MDB_txn*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    ::MDB_cursor* ptr2 = arg2 == NULL ? NULL : (::MDB_cursor*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
-    jint rarg = 0;
-    int rvalue = mdb_cursor_open(ptr0, (MDB_dbi)arg1, (arg2 == NULL ? NULL : &ptr2));
-    rarg = (jint)rvalue;
-    if (arg2 != NULL) env->SetLongField(arg2, JavaCPP_addressFID, ptr_to_jlong(ptr2));
     return rarg;
 }
 JNIEXPORT void JNICALL Java_org_deephacks_lmdbjni_LMDB_mdb_1cursor_1close(JNIEnv* env, jclass cls, jobject arg0) {
