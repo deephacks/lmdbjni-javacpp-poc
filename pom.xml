@@ -11,13 +11,13 @@
   <description>lmdb-javacpp</description>
 
 
-    <properties>
+  <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javacpp.cppbuild.skip>false</javacpp.cppbuild.skip> <!-- To skip execution of cppbuild.sh: -Djavacpp.cppbuild.skip=true -->
     <javacpp.parser.skip>false</javacpp.parser.skip>     <!-- To skip header file parsing phase: -Djavacpp.parser.skip=true  -->
     <javacpp.compiler.skip>false</javacpp.compiler.skip> <!-- To skip native compilation phase: -Djavacpp.compiler.skip=true -->
-    </properties>
-    
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.bytedeco</groupId>
@@ -91,11 +91,11 @@
               <name>platform.root</name>
               <value>${javacpp.platform.root}</value>
             </property>
-            <property>
-              <name>platform.compiler</name>
-              <value>gcc</value>
+            <!--<property>-->
+              <!--<name>platform.compiler</name>-->
+              <!--<value>gcc</value>-->
               <!--<value>${javacpp.platform.compiler}</value>-->
-            </property>
+            <!--</property>-->
           </propertyKeysAndValues>
           <classPath>${project.build.outputDirectory}</classPath>
           <includePath>${basedir}/src/main/native</includePath>
@@ -109,17 +109,15 @@
               <goal>build</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.sourceDirectory}</outputDirectory>
-              <classOrPackageName>org.deephacks.lmdbjni.*</classOrPackageName>
-            </configuration>
-          </execution>
-          <execution>
-            <id>javacpp.compiler</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>build</goal>
-            </goals>
-            <configuration>
+              <compilerOptions>
+                <option>-fpermissive</option>
+                <!--<option>-Wl,-Bstatic</option>-->
+                <!--<option>&#45;&#45;static</option>-->
+                <!--<option>-llmdb</option>-->
+                <!--<option>/home/stoffe/dev/lmdbjni-javacpp-poc/src/main/native/liblmdb.a</option>-->
+              </compilerOptions>
+              <deleteJniFiles>false</deleteJniFiles>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
               <classOrPackageName>org.deephacks.lmdbjni.*</classOrPackageName>
               <copyLibs>true</copyLibs>
             </configuration>
