@@ -32,6 +32,7 @@ public class LMDBTest {
     val.putInt(1).flip();
     db1.put(tx, key, val);
     ByteBuffer value = db1.get(tx, key);
+    System.out.println(value.getInt());
     tx.commit();
   }
 }

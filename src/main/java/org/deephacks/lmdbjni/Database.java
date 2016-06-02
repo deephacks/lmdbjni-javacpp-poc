@@ -19,8 +19,8 @@ public class Database {
   }
 
   public void put(Transaction tx, byte[] key, byte[] val) {
-    MDB_val k = allocate(key);
-    MDB_val v = allocate(val);
+    MDB_val k = allocateMDB_val(key);
+    MDB_val v = allocateMDB_val(val);
     checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
   }
 
@@ -40,16 +40,16 @@ public class Database {
     k.mv_data(new Pointer(key));
     MDB_val result = new MDB_val();
     checkRc(mdb_get(tx.tx, dbi[0], k, result));
-
     // TODO:
-    // MDB_val.data points to an address
+    // MDB_val.data points to an address ...
     // how to wrap it in a ByteBuffer?
 
-    return null;
+    // this does not work.. Maybe tweak InfoMapper to return a PointerPointer?
+    return result.mv_data().asByteBuffer();
   }
 
   public byte[] get(Transaction tx, byte[] key) {
-    MDB_val k = allocate(key);
+    MDB_val k = allocateMDB_val(key);
     MDB_val result = new MDB_val();
     checkRc(mdb_get(tx.tx, dbi[0], k, result));
     UnsafeBuffer buffer = new UnsafeBuffer(result.address(), 16);
@@ -63,7 +63,7 @@ public class Database {
     return value;
   }
 
-  private static MDB_val allocate(byte[] value) {
+  private static MDB_val allocateMDB_val(byte[] value) {
     ByteBuffer bb = ByteBuffer.allocateDirect(value.length);
     bb.put(value).flip();
     MDB_val val = new MDB_val();
