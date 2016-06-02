@@ -24,6 +24,30 @@ public class Database {
     checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
   }
 
+  public void put(Transaction tx, ByteBuffer key, ByteBuffer val) {
+    MDB_val k = new MDB_val();
+    k.mv_size(key.capacity());
+    k.mv_data(new Pointer(key));
+    MDB_val v = new MDB_val(new Pointer(val));
+    v.mv_size(val.capacity());
+    v.mv_data(new Pointer(val));
+    checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
+  }
+
+  public ByteBuffer get(Transaction tx, ByteBuffer key) {
+    MDB_val k = new MDB_val();
+    k.mv_size(key.capacity());
+    k.mv_data(new Pointer(key));
+    MDB_val result = new MDB_val();
+    checkRc(mdb_get(tx.tx, dbi[0], k, result));
+
+    // TODO:
+    // MDB_val.data points to an address
+    // how to wrap it in a ByteBuffer?
+
+    return null;
+  }
+
   public byte[] get(Transaction tx, byte[] key) {
     MDB_val k = allocate(key);
     MDB_val result = new MDB_val();
@@ -47,4 +71,5 @@ public class Database {
     val.mv_data(new Pointer(bb));
     return val;
   }
+
 }
