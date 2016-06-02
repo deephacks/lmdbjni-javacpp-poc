@@ -2,12 +2,14 @@ package org.deephacks.lmdbjni;
 
 import org.agrona.concurrent.UnsafeBuffer;
 import org.bytedeco.javacpp.Pointer;
+import static org.deephacks.lmdbjni.LMDB.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import static org.deephacks.lmdbjni.LMDB.mdb_get;
 import static org.deephacks.lmdbjni.LMDB.mdb_put;
+import static org.deephacks.lmdbjni.Util.checkRc;
 
 public class Database {
   int[] dbi;
@@ -17,15 +19,15 @@ public class Database {
   }
 
   public void put(Transaction tx, byte[] key, byte[] val) {
-    LMDB.MDB_val k = allocate(key);
-    LMDB.MDB_val v = allocate(val);
-    Util.checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
+    MDB_val k = allocate(key);
+    MDB_val v = allocate(val);
+    checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
   }
 
   public byte[] get(Transaction tx, byte[] key) {
-    LMDB.MDB_val k = allocate(key);
-    LMDB.MDB_val result = new LMDB.MDB_val();
-    Util.checkRc(mdb_get(tx.tx, dbi[0], k, result));
+    MDB_val k = allocate(key);
+    MDB_val result = new MDB_val();
+    checkRc(mdb_get(tx.tx, dbi[0], k, result));
     UnsafeBuffer buffer = new UnsafeBuffer(result.address(), 16);
 
     long size = buffer.getLong(0, ByteOrder.LITTLE_ENDIAN);
@@ -37,10 +39,10 @@ public class Database {
     return value;
   }
 
-  private static LMDB.MDB_val allocate(byte[] value) {
+  private static MDB_val allocate(byte[] value) {
     ByteBuffer bb = ByteBuffer.allocateDirect(value.length);
     bb.put(value).flip();
-    LMDB.MDB_val val = new LMDB.MDB_val();
+    MDB_val val = new MDB_val();
     val.mv_size(value.length);
     val.mv_data(new Pointer(bb));
     return val;

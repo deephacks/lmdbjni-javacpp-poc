@@ -1,10 +1,16 @@
 package org.deephacks.lmdbjni;
 
+import org.junit.Test;
+
 import java.util.Arrays;
 
-public class Main {
-  public static void main(String[] args) {
+public class LMDBTest {
+  static {
     System.setProperty("java.library.path", "./target/classes");
+  }
+
+  @Test
+  public void testGetPut() {
     Env env = new Env("/tmp/lmdb");
     Transaction tx = env.openWriteTx();
     Database db1 = env.openDatabase(tx, "db1");

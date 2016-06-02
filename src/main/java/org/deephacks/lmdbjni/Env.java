@@ -6,6 +6,7 @@ import static org.deephacks.lmdbjni.Util.checkRc;
 
 public class Env {
   private MDB_env env;
+
   public Env(String path) {
     this(path, 10485760);
   }
@@ -16,7 +17,7 @@ public class Env {
     checkRc(mdb_env_set_maxreaders(env, 1));
     checkRc(mdb_env_set_mapsize(env, size));
     checkRc(mdb_env_set_maxdbs(env, 4));
-    checkRc(mdb_env_open(env, path, LMDB.MDB_WRITEMAP, 0664));
+    checkRc(mdb_env_open(env, path, MDB_WRITEMAP, 0664));
   }
 
   public Transaction openWriteTx() {
@@ -27,7 +28,7 @@ public class Env {
 
   public Database openDatabase(Transaction tx, String name) {
     int dbi[] = new int[1];
-    checkRc(mdb_dbi_open(tx.tx, name, LMDB.MDB_CREATE, dbi));
+    checkRc(mdb_dbi_open(tx.tx, name, MDB_CREATE, dbi));
     return new Database(dbi);
   }
 }
