@@ -52,7 +52,7 @@ public class LMDBTest {
 
     // check the CRCs are symmetrical
     final long crcFromDb = db1.crcViaDirectBuffer(tx);
-    assertThat(db1.crcViaByteBuffer(tx), is(crcFromDb));
+    assertThat(db1.crcViaByteBufferReflection(tx), is(crcFromDb));
 
     // run the cursor speed test (hacky: move to JMH)
     final long start = nanoTime();

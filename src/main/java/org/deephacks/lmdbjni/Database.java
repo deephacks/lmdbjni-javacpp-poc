@@ -31,13 +31,14 @@ public class Database {
 
   int[] dbi;
 
-
   final ByteBuffer keyBb = allocateDirect(1);
   final MutableDirectBuffer mdb = new UnsafeBuffer(new byte[0]);
   final ByteBuffer valBb = allocateDirect(1);
+
   public Database(int[] dbi) {
     this.dbi = dbi;
   }
+
   public long crcViaByteBuffer(Transaction tx) {
     final MDB_cursor cursor = new MDB_cursor();
     checkRc(mdb_cursor_open(tx.tx, dbi[0], cursor));
@@ -77,11 +78,13 @@ public class Database {
       assert v.mv_size() > 0;
 
       final Pointer keyData = k.mv_data();
-      keyData.capacity(k.mv_size());
+      keyData.capacity(k.mv_size()); // only works as Pointer layout matches BB
 
       final Pointer valData = v.mv_data();
       valData.capacity(v.mv_size());
 
+      // TODO: using unsafe here is likely faster
+      // TODO: use unsafe to set the capacity and limit and position in BB
       setByteBufferAddress(keyBb, v.mv_data().address());
       setByteBufferAddress(valBb, v.mv_data().address());
       crc32.update(keyBb);
@@ -89,7 +92,6 @@ public class Database {
     }
     return crc32.getValue();
   }
-
 
   public long crcViaDirectBuffer(Transaction tx) {
     final MDB_cursor cursor = new MDB_cursor();
