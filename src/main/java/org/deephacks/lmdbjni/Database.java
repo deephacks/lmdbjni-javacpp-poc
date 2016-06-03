@@ -1,12 +1,10 @@
 package org.deephacks.lmdbjni;
 
-import org.agrona.concurrent.UnsafeBuffer;
+import static java.lang.Integer.MAX_VALUE;
 import org.bytedeco.javacpp.Pointer;
 import static org.deephacks.lmdbjni.LMDB.*;
 
 import java.nio.ByteBuffer;
-import static java.nio.ByteBuffer.allocateDirect;
-import java.nio.ByteOrder;
 import org.bytedeco.javacpp.BytePointer;
 
 import static org.deephacks.lmdbjni.LMDB.mdb_get;
@@ -14,6 +12,7 @@ import static org.deephacks.lmdbjni.LMDB.mdb_put;
 import static org.deephacks.lmdbjni.Util.checkRc;
 
 public class Database {
+
   int[] dbi;
 
   public Database(int[] dbi) {
@@ -34,7 +33,7 @@ public class Database {
     final MDB_val v = new MDB_val();
     v.mv_size(val.limit());
     v.mv_data(new Pointer(val));
-    
+
     checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
   }
 
@@ -42,9 +41,9 @@ public class Database {
     final MDB_val k = new MDB_val();
     k.mv_size(key.limit());
     k.mv_data(new Pointer(key));
-    
+
     final MDB_val v = new MDB_val();
-    
+
     checkRc(mdb_get(tx.tx, dbi[0], k, v));
     final long size = v.mv_size();
     final Pointer mv_data = v.mv_data();
@@ -63,18 +62,18 @@ public class Database {
 
     checkRc(mdb_get(tx.tx, dbi[0], k, v));
     final long size = v.mv_size();
-    if (size > Integer.MAX_VALUE) {
+    if (size > MAX_VALUE) {
       throw new UnsupportedOperationException("Value too large for byte[]");
     }
     final Pointer mv_data = v.mv_data();
     mv_data.capacity(size);
-    
+
     assert mv_data.position() == 0;
     assert mv_data.limit() == size;
     assert mv_data.capacity() == size;
-    
+
     // forced copy to byte[]
-    byte[] vBytes = new byte[(int)size];
+    byte[] vBytes = new byte[(int) size];
     mv_data.asByteBuffer().get(vBytes);
     return vBytes;
   }
