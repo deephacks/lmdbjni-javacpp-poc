@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import static java.lang.Integer.BYTES;
 import static java.lang.System.nanoTime;
+import static java.lang.System.setOut;
 import static java.lang.System.setProperty;
+
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -37,10 +39,13 @@ public class LMDBTest {
 
   private final String DB_NAME = "db1";
   private Env env;
+  File hawtjnipath;
 
   @Before
   public void before() throws IOException {
-    final File path = tmp.newFolder();
+    File path = tmp.newFolder();
+    env = new Env(path.getAbsolutePath());
+    this.hawtjnipath = tmp.newFolder();
     env = new Env(path.getAbsolutePath());
   }
 
@@ -108,6 +113,32 @@ public class LMDBTest {
     final long runtime = finish - start;
     System.out.println("DB: " + MILLISECONDS.convert(runtime, NANOSECONDS));
     tx.commit();
+  }
+
+
+  @Test
+  public void testCrc32ByHawtJNI() {
+    final Transaction tx = env.openWriteTx();
+    final Database db1 = env.openDatabase(tx, DB_NAME);
+    db1.insertData(tx, db1, KEY_COUNT);
+
+    final HawtJNI hawtJNI = new HawtJNI(hawtjnipath.getAbsolutePath());
+    hawtJNI.insertData(KEY_COUNT);
+
+    // check the CRCs are symmetrical
+    final long crcFromDb = db1.crcViaDirectBuffer(tx);
+    assertThat(hawtJNI.crcViaDirectBuffer(), is(crcFromDb));
+
+    // run the cursor speed test (hacky: move to JMH)
+    final long start = nanoTime();
+    int sum = 0;
+    for (int i = 0; i < RUNS; i++) {
+      sum += hawtJNI.crcViaDirectBuffer();
+    }
+    final long finish = nanoTime();
+    final long runtime = finish - start;
+    System.out.println("HawtJNI: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    hawtJNI.commit();
   }
 
   @Test

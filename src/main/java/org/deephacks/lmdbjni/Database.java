@@ -13,6 +13,8 @@ import java.util.zip.CRC32;
 import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.bytedeco.javacpp.BytePointer;
+import org.fusesource.lmdbjni.DirectBuffer;
+
 import static org.deephacks.lmdbjni.BufferUtils.setByteBufferAddress;
 
 import static org.deephacks.lmdbjni.LMDB.mdb_get;
