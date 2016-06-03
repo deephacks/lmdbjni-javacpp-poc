@@ -50,14 +50,11 @@ public class LMDBTest {
     final Database db1 = env.openDatabase(tx, DB_NAME);
     final ByteBuffer key = ByteBuffer.allocateDirect(BYTES);
     key.order(LITTLE_ENDIAN);
-    assertThat(key.order(), is(LITTLE_ENDIAN));
     key.putInt(1).flip();
 
     final ByteBuffer val = ByteBuffer.allocateDirect(BYTES);
     val.order(LITTLE_ENDIAN);
-    assertThat(val.order(), is(LITTLE_ENDIAN));
     val.putInt(42).flip();
-    val.order(ByteOrder.LITTLE_ENDIAN);
 
     db1.put(tx, key, val);
     final ByteBuffer fetchedVal = db1.get(tx, key);
