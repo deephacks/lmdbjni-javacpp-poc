@@ -125,10 +125,6 @@ public class LMDBTest {
     final HawtJNI hawtJNI = new HawtJNI(hawtjnipath.getAbsolutePath());
     hawtJNI.insertData(KEY_COUNT);
 
-    // check the CRCs are symmetrical
-    final long crcFromDb = db1.crcViaDirectBuffer(tx);
-    assertThat(hawtJNI.crcViaDirectBuffer(), is(crcFromDb));
-
     // run the cursor speed test (hacky: move to JMH)
     final long start = nanoTime();
     int sum = 0;
@@ -139,6 +135,13 @@ public class LMDBTest {
     final long runtime = finish - start;
     System.out.println("HawtJNI: " + MILLISECONDS.convert(runtime, NANOSECONDS));
     hawtJNI.commit();
+
+    // check the CRCs are symmetrical
+    int sum2 = 0;
+    for (int i = 0; i < RUNS; i++) {
+      sum2 += db1.crcViaDirectBuffer(tx);
+    }
+    assertThat(sum, is(sum2));
   }
 
   @Test
