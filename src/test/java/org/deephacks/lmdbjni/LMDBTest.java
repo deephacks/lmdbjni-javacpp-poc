@@ -52,17 +52,17 @@ public class LMDBTest {
 
     // check the CRCs are symmetrical
     final long crcFromDb = db1.crcViaDirectBuffer(tx);
-    assertThat(db1.crcViaByteBufferReflection(tx), is(crcFromDb));
+    assertThat(db1.crcViaByteBufferReuse(tx), is(crcFromDb));
 
     // run the cursor speed test (hacky: move to JMH)
     final long start = nanoTime();
     int sum = 0;
     for (int i = 0; i < RUNS; i++) {
-      sum += db1.crcViaByteBufferReflection(tx);
+      sum += db1.crcViaByteBufferReuse(tx);
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    System.out.println("BB Reflection: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    System.out.println("BB Buffer Reused: " + MILLISECONDS.convert(runtime, NANOSECONDS));
     tx.commit();
   }
 
@@ -84,7 +84,7 @@ public class LMDBTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    System.out.println("BB Safe: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    System.out.println("BB New Buffers: " + MILLISECONDS.convert(runtime, NANOSECONDS));
     tx.commit();
   }
 

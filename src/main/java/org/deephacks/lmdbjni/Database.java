@@ -18,6 +18,7 @@ import static org.deephacks.lmdbjni.BufferUtils.setByteBufferAddress;
 import static org.deephacks.lmdbjni.LMDB.mdb_get;
 import static org.deephacks.lmdbjni.LMDB.mdb_put;
 import static org.deephacks.lmdbjni.Util.checkRc;
+import static java.lang.Math.max;
 
 public class Database {
 
@@ -65,7 +66,7 @@ public class Database {
     return crc32.getValue();
   }
 
-  public long crcViaByteBufferReflection(Transaction tx) {
+  public long crcViaByteBufferReuse(Transaction tx) {
     final MDB_cursor cursor = new MDB_cursor();
     checkRc(mdb_cursor_open(tx.tx, dbi[0], cursor));
 
@@ -77,16 +78,8 @@ public class Database {
       assert k.mv_size() > 0;
       assert v.mv_size() > 0;
 
-      final Pointer keyData = k.mv_data();
-      keyData.capacity(k.mv_size()); // only works as Pointer layout matches BB
-
-      final Pointer valData = v.mv_data();
-      valData.capacity(v.mv_size());
-
-      // TODO: using unsafe here is likely faster
-      // TODO: use unsafe to set the capacity and limit and position in BB
-      setByteBufferAddress(keyBb, v.mv_data().address());
-      setByteBufferAddress(valBb, v.mv_data().address());
+      MemoryAccess.wrap(keyBb, k.mv_data().address(), (int)k.mv_size());
+      MemoryAccess.wrap(valBb, v.mv_data().address(), (int)v.mv_size());
       crc32.update(keyBb);
       crc32.update(valBb);
     }
