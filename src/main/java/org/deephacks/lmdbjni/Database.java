@@ -13,6 +13,7 @@ import java.util.zip.CRC32;
 import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.bytedeco.javacpp.BytePointer;
+import static org.deephacks.lmdbjni.BufferUtils.setByteBufferAddress;
 
 import static org.deephacks.lmdbjni.LMDB.mdb_get;
 import static org.deephacks.lmdbjni.LMDB.mdb_put;
@@ -30,10 +31,13 @@ public class Database {
 
   int[] dbi;
 
+
+  final ByteBuffer keyBb = allocateDirect(1);
+  final MutableDirectBuffer mdb = new UnsafeBuffer(new byte[0]);
+  final ByteBuffer valBb = allocateDirect(1);
   public Database(int[] dbi) {
     this.dbi = dbi;
   }
-
   public long crcViaByteBuffer(Transaction tx) {
     final MDB_cursor cursor = new MDB_cursor();
     checkRc(mdb_cursor_open(tx.tx, dbi[0], cursor));
@@ -60,6 +64,33 @@ public class Database {
     return crc32.getValue();
   }
 
+  public long crcViaByteBufferReflection(Transaction tx) {
+    final MDB_cursor cursor = new MDB_cursor();
+    checkRc(mdb_cursor_open(tx.tx, dbi[0], cursor));
+
+    final MDB_val k = new MDB_val();
+    final MDB_val v = new MDB_val();
+
+    final CRC32 crc32 = new CRC32();
+    while (mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
+      assert k.mv_size() > 0;
+      assert v.mv_size() > 0;
+
+      final Pointer keyData = k.mv_data();
+      keyData.capacity(k.mv_size());
+
+      final Pointer valData = v.mv_data();
+      valData.capacity(v.mv_size());
+
+      setByteBufferAddress(keyBb, v.mv_data().address());
+      setByteBufferAddress(valBb, v.mv_data().address());
+      crc32.update(keyBb);
+      crc32.update(valBb);
+    }
+    return crc32.getValue();
+  }
+
+
   public long crcViaDirectBuffer(Transaction tx) {
     final MDB_cursor cursor = new MDB_cursor();
     checkRc(mdb_cursor_open(tx.tx, dbi[0], cursor));
@@ -67,15 +98,14 @@ public class Database {
     final MDB_val k = new MDB_val();
     final MDB_val v = new MDB_val();
 
-    final MutableDirectBuffer mdb = new UnsafeBuffer(new byte[0]);
     final CRC32 crc32 = new CRC32();
 
     while (mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
       assert k.mv_size() > 0;
       assert v.mv_size() > 0;
 
-      long biggest = max(k.mv_size(), v.mv_size());
-      byte[] scratch = new byte[(int) biggest];
+      final long biggest = max(k.mv_size(), v.mv_size());
+      final byte[] scratch = new byte[(int) biggest];
 
       wrap(mdb, k);
       mdb.getBytes(0, scratch);
@@ -134,14 +164,14 @@ public class Database {
     final ByteBuffer key = allocateDirect(BYTES);
     key.order(LITTLE_ENDIAN);
 
-    final ByteBuffer val = allocateDirect(BYTES);
+    final ByteBuffer val = allocateDirect(BYTES * 4);
     val.order(LITTLE_ENDIAN);
 
     for (int k = 0; k <= opCount; k++) {
       key.clear();
       val.clear();
       key.putInt(k).flip();
-      val.putInt(k).flip();
+      val.putInt(k).putInt(k).putInt(k).putInt(k).flip();
       db1.put(tx, key, val);
     }
   }
@@ -164,7 +194,7 @@ public class Database {
     checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
   }
 
-  private void wrap(MutableDirectBuffer mdb, MDB_val mdbVal) {
+  private void wrap(final MutableDirectBuffer mdb, final MDB_val mdbVal) {
     final long size = mdbVal.mv_size();
     if (size > MAX_VALUE) {
       throw new UnsupportedOperationException("Value too large for Agrona");

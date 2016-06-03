@@ -12,6 +12,7 @@ import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import org.agrona.concurrent.UnsafeBuffer;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
@@ -22,6 +23,10 @@ public class LMDBTest {
 
   private static final int KEY_COUNT = 1_000;
   private static final int RUNS = 10_000;
+  
+  static {
+    System.setProperty(UnsafeBuffer.DISABLE_BOUNDS_CHECKS_PROP_NAME, "true");
+  }
 
   static {
     setProperty("java.library.path", "./target/classes");
@@ -40,7 +45,29 @@ public class LMDBTest {
   }
 
   @Test
-  public void testCrc32ByByteBuffer() {
+  public void testCrc32ByByteBufferReflection() {
+    final Transaction tx = env.openWriteTx();
+    final Database db1 = env.openDatabase(tx, DB_NAME);
+    db1.insertData(tx, db1, KEY_COUNT);
+
+    // check the CRCs are symmetrical
+    final long crcFromDb = db1.crcViaDirectBuffer(tx);
+    assertThat(db1.crcViaByteBuffer(tx), is(crcFromDb));
+
+    // run the cursor speed test (hacky: move to JMH)
+    final long start = nanoTime();
+    int sum = 0;
+    for (int i = 0; i < RUNS; i++) {
+      sum += db1.crcViaByteBufferReflection(tx);
+    }
+    final long finish = nanoTime();
+    final long runtime = finish - start;
+    System.out.println("BB Reflection: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    tx.commit();
+  }
+
+  @Test
+  public void testCrc32ByByteBufferSafe() {
     final Transaction tx = env.openWriteTx();
     final Database db1 = env.openDatabase(tx, DB_NAME);
     db1.insertData(tx, db1, KEY_COUNT);
@@ -57,7 +84,7 @@ public class LMDBTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    System.out.println("BB: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    System.out.println("BB Safe: " + MILLISECONDS.convert(runtime, NANOSECONDS));
     tx.commit();
   }
 
