@@ -2,9 +2,12 @@ package org.deephacks.lmdbjni;
 
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Integer.BYTES;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
@@ -45,16 +48,24 @@ public class LMDBTest {
   public void testGetPutByteBuffer() {
     final Transaction tx = env.openWriteTx();
     final Database db1 = env.openDatabase(tx, DB_NAME);
-    final ByteBuffer key = ByteBuffer.allocateDirect(Integer.BYTES);
+    final ByteBuffer key = ByteBuffer.allocateDirect(BYTES);
+    key.order(LITTLE_ENDIAN);
+    assertThat(key.order(), is(LITTLE_ENDIAN));
     key.putInt(1).flip();
-    final ByteBuffer val = ByteBuffer.allocateDirect(Integer.BYTES);
+
+    final ByteBuffer val = ByteBuffer.allocateDirect(BYTES);
+    val.order(LITTLE_ENDIAN);
+    assertThat(val.order(), is(LITTLE_ENDIAN));
     val.putInt(42).flip();
+    val.order(ByteOrder.LITTLE_ENDIAN);
+
     db1.put(tx, key, val);
     final ByteBuffer fetchedVal = db1.get(tx, key);
+    assertThat(fetchedVal.order(), is(LITTLE_ENDIAN));
     assertThat(fetchedVal.position(), is(0));
-    assertThat(fetchedVal.capacity(), is(val.capacity()));
     assertThat(fetchedVal.limit(), is(val.capacity()));
-    // TODO: more assertions
+    assertThat(fetchedVal.capacity(), is(val.capacity()));
+    assertThat(fetchedVal.getInt(0),is(42));
     tx.commit();
   }
 }

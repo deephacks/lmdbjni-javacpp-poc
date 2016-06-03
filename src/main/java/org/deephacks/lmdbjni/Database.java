@@ -6,6 +6,7 @@ import static org.deephacks.lmdbjni.LMDB.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import org.bytedeco.javacpp.BytePointer;
 
 import static org.deephacks.lmdbjni.LMDB.mdb_get;
 import static org.deephacks.lmdbjni.LMDB.mdb_put;
@@ -26,35 +27,31 @@ public class Database {
 
   public void put(Transaction tx, ByteBuffer key, ByteBuffer val) {
     MDB_val k = new MDB_val();
-    k.mv_size(key.capacity());
+    k.mv_size(key.limit());
     k.mv_data(new Pointer(key));
-    MDB_val v = new MDB_val(new Pointer(val));
-    v.mv_size(val.capacity());
+
+    MDB_val v = new MDB_val();
+    v.mv_size(val.limit());
     v.mv_data(new Pointer(val));
+    
     checkRc(mdb_put(tx.tx, dbi[0], k, v, 0));
   }
 
   public ByteBuffer get(Transaction tx, ByteBuffer key) {
     MDB_val k = new MDB_val();
-    k.mv_size(key.capacity());
+    k.mv_size(key.limit());
     k.mv_data(new Pointer(key));
-    MDB_val result = new MDB_val();
-    checkRc(mdb_get(tx.tx, dbi[0], k, result));
-    // TODO:
-    // MDB_val.data points to an address ...
-    // how to wrap it in a ByteBuffer?
-
-    // this does not work.. Maybe tweak InfoMapper to return a PointerPointer?
-    Pointer mv_data = result.mv_data();
-    System.out.println("Address is " + mv_data.address());
-    System.out.println("Position is " + mv_data.position());
-    System.out.println("Limit (original) is " + mv_data.limit());
-
-    final long size = result.mv_size();
-    System.out.println("mv_data set to mv_size...");
-    mv_data.limit(size);
-    System.out.println("Limit (new) is " + mv_data.limit());
     
+    MDB_val v = new MDB_val();
+    
+    checkRc(mdb_get(tx.tx, dbi[0], k, v));
+    final long size = v.mv_size();
+    Pointer mv_data = v.mv_data();
+    mv_data.limit(size);
+    mv_data.capacity(size);
+    assert mv_data.position() == 0;
+    assert mv_data.limit() == size;
+    assert mv_data.capacity() == size;
     return mv_data.asByteBuffer();
   }
 
