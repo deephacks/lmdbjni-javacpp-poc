@@ -1,39 +1,60 @@
 package org.deephacks.lmdbjni;
 
+import java.io.File;
+import java.io.IOException;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 public class LMDBTest {
+
   static {
     System.setProperty("java.library.path", "./target/classes");
   }
 
-  @Test
-  public void testGetPutByteArray() {
-    Env env = new Env("/tmp/lmdb");
-    Transaction tx = env.openWriteTx();
-    Database db1 = env.openDatabase(tx, "db1");
-    db1.put(tx, new byte[] {1}, new byte[] {4});
-    byte[] bytes = db1.get(tx, new byte[]{1});
-    System.out.println(Arrays.toString(bytes));
-    tx.commit();
+  @Rule
+  public TemporaryFolder tmp = new TemporaryFolder();
+
+  private final String DB_NAME = "db1";
+  private Env env;
+
+  @Before
+  public void before() throws IOException {
+    final File path = tmp.newFolder();
+    env = new Env(path.getAbsolutePath());
   }
 
   @Test
-  public void testGetPutByteBuffer() {
-    Env env = new Env("/tmp/lmdb");
-    Transaction tx = env.openWriteTx();
-    Database db1 = env.openDatabase(tx, "db1");
-    ByteBuffer key = ByteBuffer.allocateDirect(4);
-    key.putInt(1).flip();
-    ByteBuffer val = ByteBuffer.allocateDirect(4);
-    val.putInt(1).flip();
+  public void testGetPutByteArray() {
+    final Transaction tx = env.openWriteTx();
+    final Database db1 = env.openDatabase(tx, DB_NAME);
+    final byte[] key = new byte[]{1};
+    final byte[] val = new byte[]{42};
     db1.put(tx, key, val);
-    ByteBuffer value = db1.get(tx, key);
-    System.out.println(value.getInt());
+    final byte[] fetchedVal = db1.get(tx, key);
+    assertThat(fetchedVal, is(val));
+    tx.commit();
+  }
+  
+  @Test
+  public void testGetPutByteBuffer() {
+    final Transaction tx = env.openWriteTx();
+    final Database db1 = env.openDatabase(tx, DB_NAME);
+    final ByteBuffer key = ByteBuffer.allocateDirect(Integer.BYTES);
+    key.putInt(1).flip();
+    final ByteBuffer val = ByteBuffer.allocateDirect(Integer.BYTES);
+    val.putInt(42).flip();
+    db1.put(tx, key, val);
+    final ByteBuffer fetchedVal = db1.get(tx, key);
+    assertThat(fetchedVal.position(), is(0));
+    assertThat(fetchedVal.capacity(), is(val.capacity()));
+    assertThat(fetchedVal.limit(), is(val.capacity()));
+    // TODO: more assertions
     tx.commit();
   }
 }
-

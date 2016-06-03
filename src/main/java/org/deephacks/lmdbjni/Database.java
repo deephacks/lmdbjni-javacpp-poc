@@ -45,7 +45,17 @@ public class Database {
     // how to wrap it in a ByteBuffer?
 
     // this does not work.. Maybe tweak InfoMapper to return a PointerPointer?
-    return result.mv_data().asByteBuffer();
+    Pointer mv_data = result.mv_data();
+    System.out.println("Address is " + mv_data.address());
+    System.out.println("Position is " + mv_data.position());
+    System.out.println("Limit (original) is " + mv_data.limit());
+
+    final long size = result.mv_size();
+    System.out.println("mv_data set to mv_size...");
+    mv_data.limit(size);
+    System.out.println("Limit (new) is " + mv_data.limit());
+    
+    return mv_data.asByteBuffer();
   }
 
   public byte[] get(Transaction tx, byte[] key) {
