@@ -7,7 +7,7 @@ package org.deephacks.lmdbjni;
 import java.nio.*;
 import org.deephacks.lmdbjni.LMDB.MDB_val;
 
-abstract class MemoryAccess {
+public abstract class MemoryAccess {
 
   private static final sun.misc.Unsafe UNSAFE;
   private static final long ADDRESS;

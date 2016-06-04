@@ -1,6 +1,4 @@
-package org.deephacks.lmdbjni;
-
-import static org.deephacks.lmdbjni.LMDB.mdb_strerror;
+package org.deephacks.lmdbjni.jnr;
 
 class Util {
   static void checkRc(int rc) {

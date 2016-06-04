@@ -79,7 +79,7 @@ public class LMDBTest {
   }
   
   private void report(String name, long nanos, int csum) {
-    System.out.println(name + ": " + MILLISECONDS.convert(nanos, NANOSECONDS) + "\t" + csum));    
+    System.out.println(name + ": " + MILLISECONDS.convert(nanos, NANOSECONDS) + "\t" + csum);
   }
 
   @Test
