@@ -3,15 +3,12 @@ package org.deephacks.lmdbjni.jnr;
 import static java.lang.Integer.BYTES;
 import java.nio.ByteBuffer;
 import static java.nio.ByteBuffer.allocateDirect;
-import java.nio.ByteOrder;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import java.util.zip.CRC32;
 import jnr.ffi.Memory;
-import jnr.ffi.NativeType;
 import static jnr.ffi.NativeType.ADDRESS;
 import static jnr.ffi.NativeType.UINT;
 import jnr.ffi.Pointer;
-import jnr.ffi.Struct;
 import jnr.ffi.provider.jffi.ByteBufferMemoryIO;
 import org.deephacks.lmdbjni.MemoryAccess;
 import static org.deephacks.lmdbjni.jnr.Library.MDB_CREATE;
@@ -90,9 +87,9 @@ public class Database {
     while (lib.mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
       assert k.size.get() > 0;
       assert v.size.get() > 0;
-      
-      MemoryAccess.wrap(keyBb, k.data.get().address(), (int)k.size.get());
-      MemoryAccess.wrap(valBb, v.data.get().address(), (int)v.size.get());
+
+      MemoryAccess.wrap(keyBb, k.data.get().address(), (int) k.size.get());
+      MemoryAccess.wrap(valBb, v.data.get().address(), (int) v.size.get());
 
       crc32.update(keyBb);
       crc32.update(valBb);
