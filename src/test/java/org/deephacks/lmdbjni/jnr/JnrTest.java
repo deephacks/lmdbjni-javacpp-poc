@@ -76,7 +76,7 @@ public class JnrTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    report("JNR Reuse", runtime, sum);
+    report("JNR BB Reuse", runtime, sum);
     tx.commit();
   }
   

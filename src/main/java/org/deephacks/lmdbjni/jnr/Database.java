@@ -90,7 +90,7 @@ public class Database {
     while (lib.mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
       assert k.size.get() > 0;
       assert v.size.get() > 0;
-
+      
       MemoryAccess.wrap(keyBb, k.data.get().address(), (int)k.size.get());
       MemoryAccess.wrap(valBb, v.data.get().address(), (int)v.size.get());
 

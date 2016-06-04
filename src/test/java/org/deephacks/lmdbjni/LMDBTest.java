@@ -74,7 +74,7 @@ public class LMDBTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    report("BB Reuse", runtime, sum);
+    report("JavaCPP BB Reuse", runtime, sum);
     tx.commit();
   }
   
@@ -104,7 +104,7 @@ public class LMDBTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    report("BB Alloc", runtime, sum);
+    report("JavaCPP BB Alloc", runtime, sum);
     tx.commit();
   }
 
@@ -131,7 +131,7 @@ public class LMDBTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    report("DB Reuse", runtime, sum);
+    report("JavaCPP DB Reuse", runtime, sum);
     tx.commit();
   }
 
@@ -161,7 +161,7 @@ public class LMDBTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    report("HawtJNI ", runtime, sum);
+    report("HawtJNI DB Reuse", runtime, sum);
     hawtJNI.commit();
   }
 
