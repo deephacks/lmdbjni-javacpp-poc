@@ -79,9 +79,23 @@ public class Database {
     while (mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
       assert k.mv_size() > 0;
       assert v.mv_size() > 0;
+      
+      // this is faster as we don't allocate extra Java Pointer objects
+      final int kSize = (int) MemoryAccess.wrap(keyBb, k);
+      final int vSize = (int) MemoryAccess.wrap(valBb, v);
+      // this is slower than the MemoryAccess.wrap(MDB_val, BB) above....
+      //MemoryAccess.wrap(keyBb, k.mv_data().address(), (int)k.mv_size());
+      //MemoryAccess.wrap(valBb, v.mv_data().address(), (int)v.mv_size());
 
-      MemoryAccess.wrap(keyBb, k.mv_data().address(), (int)k.mv_size());
-      MemoryAccess.wrap(valBb, v.mv_data().address(), (int)v.mv_size());
+      // I tried this just in case CRC32 was inefficiently using the ByteBuffer
+      // (eg copying a few bytes at a time; but CRC32.update(BB) was far faster
+      //final int biggest = max(kSize, vSize);
+      //final byte[] scratch = new byte[biggest];
+      //keyBb.get(scratch, 0, kSize);
+      //crc32.update(scratch, 0, kSize);
+      //valBb.get(scratch, 0, vSize);
+      //crc32.update(scratch, 0, vSize);      
+      
       crc32.update(keyBb);
       crc32.update(valBb);
     }

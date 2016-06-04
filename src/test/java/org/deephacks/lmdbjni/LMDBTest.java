@@ -15,9 +15,11 @@ import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import org.agrona.concurrent.UnsafeBuffer;
+import org.fusesource.lmdbjni.DirectBuffer;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -25,9 +27,11 @@ public class LMDBTest {
 
   private static final int KEY_COUNT = 1_000;
   private static final int RUNS = 10_000;
+  private static final int WARM = RUNS / 10;
   
   static {
     System.setProperty(UnsafeBuffer.DISABLE_BOUNDS_CHECKS_PROP_NAME, "true");
+    System.setProperty(DirectBuffer.DISABLE_BOUNDS_CHECKS_PROP_NAME, "true");
   }
 
   static {
@@ -60,18 +64,26 @@ public class LMDBTest {
     assertThat(db1.crcViaByteBufferReuse(tx), is(crcFromDb));
 
     // run the cursor speed test (hacky: move to JMH)
-    final long start = nanoTime();
+    long start = 0;
     int sum = 0;
     for (int i = 0; i < RUNS; i++) {
+      if (i == WARM) {
+        start = nanoTime();
+      }
       sum += db1.crcViaByteBufferReuse(tx);
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    System.out.println("BB Buffer Reused: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    report("BB Reuse", runtime, sum);
     tx.commit();
+  }
+  
+  private void report(String name, long nanos, int csum) {
+    System.out.println(name + ": " + MILLISECONDS.convert(nanos, NANOSECONDS) + "\t" + csum));    
   }
 
   @Test
+  @Ignore
   public void testCrc32ByByteBufferSafe() {
     final Transaction tx = env.openWriteTx();
     final Database db1 = env.openDatabase(tx, DB_NAME);
@@ -82,19 +94,24 @@ public class LMDBTest {
     assertThat(db1.crcViaByteBuffer(tx), is(crcFromDb));
 
     // run the cursor speed test (hacky: move to JMH)
-    final long start = nanoTime();
+    long start = 0;
     int sum = 0;
     for (int i = 0; i < RUNS; i++) {
+      if (i == WARM) {
+        start = nanoTime();
+      }
       sum += db1.crcViaByteBuffer(tx);
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    System.out.println("BB New Buffers: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    report("BB Alloc", runtime, sum);
     tx.commit();
   }
 
   @Test
+  @Ignore
   public void testCrc32ByDirectBuffer() {
+    assertThat(UnsafeBuffer.SHOULD_BOUNDS_CHECK, is(false));
     final Transaction tx = env.openWriteTx();
     final Database db1 = env.openDatabase(tx, DB_NAME);
     db1.insertData(tx, db1, KEY_COUNT);
@@ -104,44 +121,48 @@ public class LMDBTest {
     assertThat(db1.crcViaByteBuffer(tx), is(crcFromDb));
 
     // run the cursor speed test (hacky: move to JMH)
-    final long start = nanoTime();
+    long start = 0;
     int sum = 0;
     for (int i = 0; i < RUNS; i++) {
+      if (i == WARM) {
+        start = nanoTime();
+      }
       sum += db1.crcViaDirectBuffer(tx);
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    System.out.println("DB: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    report("DB Reuse", runtime, sum);
     tx.commit();
   }
 
 
   @Test
   public void testCrc32ByHawtJNI() {
-    final Transaction tx = env.openWriteTx();
-    final Database db1 = env.openDatabase(tx, DB_NAME);
-    db1.insertData(tx, db1, KEY_COUNT);
-
+    assertThat(DirectBuffer.SHOULD_BOUNDS_CHECK, is(false));
     final HawtJNI hawtJNI = new HawtJNI(hawtjnipath.getAbsolutePath());
     hawtJNI.insertData(KEY_COUNT);
 
+    // check the CRCs are symmetrical
+    final Transaction tx = env.openWriteTx();
+    final Database db1 = env.openDatabase(tx, DB_NAME);
+    db1.insertData(tx, db1, KEY_COUNT);
+    final long crcFromBb = db1.crcViaByteBufferReuse(tx);
+    assertThat(hawtJNI.crcViaDirectBuffer(), is(crcFromBb));
+    tx.commit();
+
     // run the cursor speed test (hacky: move to JMH)
-    final long start = nanoTime();
+    long start = 0;
     int sum = 0;
     for (int i = 0; i < RUNS; i++) {
+      if (i == WARM) {
+        start = nanoTime();
+      }
       sum += hawtJNI.crcViaDirectBuffer();
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    System.out.println("HawtJNI: " + MILLISECONDS.convert(runtime, NANOSECONDS));
+    report("HawtJNI ", runtime, sum);
     hawtJNI.commit();
-
-    // check the CRCs are symmetrical
-    int sum2 = 0;
-    for (int i = 0; i < RUNS; i++) {
-      sum2 += db1.crcViaDirectBuffer(tx);
-    }
-    assertThat(sum, is(sum2));
   }
 
   @Test

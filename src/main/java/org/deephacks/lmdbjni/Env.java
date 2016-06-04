@@ -1,7 +1,6 @@
 package org.deephacks.lmdbjni;
 
 import static org.deephacks.lmdbjni.LMDB.*;
-import static org.deephacks.lmdbjni.LMDB.mdb_env_open;
 import static org.deephacks.lmdbjni.Util.checkRc;
 import static org.deephacks.lmdbjni.LMDB.mdb_env_open;
 

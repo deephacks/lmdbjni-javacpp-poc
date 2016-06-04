@@ -51,7 +51,6 @@ public class HawtJNI {
     DirectBuffer v = new DirectBuffer(0, 0);
 
     while (cursor.position(k, v, GetOp.NEXT) == 0) {
-
       assert k.capacity() > 0;
       assert v.capacity() > 0;
 

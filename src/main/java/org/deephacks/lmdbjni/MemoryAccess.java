@@ -5,6 +5,7 @@
 package org.deephacks.lmdbjni;
 
 import java.nio.*;
+import org.deephacks.lmdbjni.LMDB.MDB_val;
 
 abstract class MemoryAccess {
 
@@ -22,6 +23,14 @@ abstract class MemoryAccess {
     } catch (Exception e) {
       throw new UnsupportedOperationException(e);
     }
+  }
+
+  public static long wrap(ByteBuffer buffer, MDB_val val) {
+    // struct MDB_val { size_t mv_size; void *mv_data; }
+    final long size = UNSAFE.getLong(val.address());
+    final long data = UNSAFE.getLong(val.address() + Long.BYTES);
+    wrap(buffer, data, (int) size);
+    return size;
   }
 
   public static void wrap(ByteBuffer buffer, long address, int capacity) {
