@@ -60,7 +60,7 @@ public class JnrTest {
   }
 
   @Test
-  public void testCrc32ByByteBufferReflection() {
+  public void testCrc32ByByteBufferStructs() {
     final Transaction tx = env.openWriteTx();
     final Database db1 = env.openDatabase(tx, DB_NAME);
     db1.insertData(tx, db1, KEY_COUNT);
@@ -76,7 +76,28 @@ public class JnrTest {
     }
     final long finish = nanoTime();
     final long runtime = finish - start;
-    report("JNR BB Reuse", runtime, sum);
+    report("JNR BB Reuse w/ Struct", runtime, sum);
+    tx.commit();
+  }
+  
+  @Test
+  public void testCrc32ByByteBufferAddress() {
+    final Transaction tx = env.openWriteTx();
+    final Database db1 = env.openDatabase(tx, DB_NAME);
+    db1.insertData(tx, db1, KEY_COUNT);
+
+    // run the cursor speed test (hacky: move to JMH)
+    long start = 0;
+    int sum = 0;
+    for (int i = 0; i < RUNS; i++) {
+      if (i == WARM) {
+        start = nanoTime();
+      }
+      sum += db1.crcWithoutMdbValStruct(tx);
+    }
+    final long finish = nanoTime();
+    final long runtime = finish - start;
+    report("JNR BB Reuse w/ Addresses", runtime, sum);
     tx.commit();
   }
   

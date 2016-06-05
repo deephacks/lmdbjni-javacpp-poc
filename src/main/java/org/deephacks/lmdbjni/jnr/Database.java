@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import java.util.zip.CRC32;
+import jnr.ffi.Memory;
 import jnr.ffi.Pointer;
 import jnr.ffi.byref.IntByReference;
 import jnr.ffi.byref.PointerByReference;
@@ -88,6 +89,14 @@ public class Database {
     return size;
   }
 
+  private static long wrap(final ByteBuffer buffer, final Pointer mdbValPtr) {
+    final long size = mdbValPtr.getLong(0);
+    final long data = mdbValPtr.getAddress(Long.BYTES);
+    // no perf gain: final long data = mdbVal.data.longValue();
+    MemoryAccess.wrap(buffer, data, (int) size);
+    return size;
+  }
+
   public long crc(Transaction tx) {
     PointerByReference cursorPtr = new PointerByReference();
     checkRc(lib.mdb_cursor_open(tx.ptr, dbi, cursorPtr));
@@ -108,4 +117,24 @@ public class Database {
     return crc32.getValue();
   }
 
+  public long crcWithoutMdbValStruct(Transaction tx) {
+    PointerByReference cursorPtr = new PointerByReference();
+    checkRc(lib.mdb_cursor_open(tx.ptr, dbi, cursorPtr));
+    final Pointer cursor = cursorPtr.getValue();
+
+    final int structSize = Long.BYTES * 2;
+    Pointer k = Memory.allocateDirect(runtime, structSize, true);
+    Pointer v = Memory.allocateDirect(runtime, structSize, true);
+
+    final CRC32 crc32 = new CRC32();
+    while (lib.mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
+      final long kSize = wrap(keyBb, k);
+      final long vSize = wrap(valBb, v);
+      assert kSize > 0;
+      assert vSize > 0;
+      crc32.update(keyBb);
+      crc32.update(valBb);
+    }
+    return crc32.getValue();
+  }
 }

@@ -57,6 +57,13 @@ public class HawtJNI {
       final long biggest = max(k.capacity(), v.capacity());
       final byte[] scratch = new byte[(int) biggest];
 
+      // TODO: This test is slightly unfair to the others because it is not
+      // incurring the cost of the ByteBuffer having it 4 fields (address,
+      // capacity, position, limit) modified, two of which are via Unsafe.
+      // It IS incurring the cost of a MutableDirectBuffer.wrap(BB) instead,
+      // although none of this uses reflection or Unsafe, so it will be cheaper
+      // than wrapping an exiting ByteBuffer to a different memory segment.
+      
       k.getBytes(0, scratch);
       crc32.update(scratch, 0, k.capacity());
 
