@@ -13,7 +13,7 @@ public class Env {
   final Pointer ptr;
   
   public Env(String path, long size) {
-    Pointer envPtr = Memory.allocate(runtime, ADDRESS);
+    Pointer envPtr = Memory.allocateDirect(runtime, ADDRESS);
     checkRc(lib.mdb_env_create(envPtr));
 
     ptr = envPtr.getPointer(0);

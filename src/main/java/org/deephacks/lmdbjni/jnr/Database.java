@@ -11,7 +11,6 @@ import static jnr.ffi.NativeType.UINT;
 import jnr.ffi.Pointer;
 import jnr.ffi.provider.jffi.ByteBufferMemoryIO;
 import org.deephacks.lmdbjni.MemoryAccess;
-import static org.deephacks.lmdbjni.MemoryAccess.UNSAFE;
 import static org.deephacks.lmdbjni.jnr.Library.MDB_CREATE;
 import static org.deephacks.lmdbjni.jnr.Library.MDB_NEXT;
 import org.deephacks.lmdbjni.jnr.Library.MDB_val;
@@ -24,12 +23,15 @@ public class Database {
   final int dbi;
 
   Database(Transaction tx, String name) {
-    Pointer dbiPtr = Memory.allocate(runtime, UINT);
+    Pointer dbiPtr = Memory.allocateDirect(runtime, UINT);
     checkRc(lib.mdb_dbi_open(tx.ptr, name, MDB_CREATE, dbiPtr));
     dbi = dbiPtr.getInt(0);
   }
 
   public void put(Transaction tx, ByteBuffer key, ByteBuffer val) {
+    assert key.isDirect();
+    assert val.isDirect();
+
     final MDB_val k = new MDB_val(runtime);
     k.size.set(key.limit());
     k.data.set(new ByteBufferMemoryIO(runtime, key));
@@ -42,6 +44,8 @@ public class Database {
   }
 
   public ByteBuffer get(Transaction tx, ByteBuffer key) {
+    assert key.isDirect();
+    
     final MDB_val k = new MDB_val(runtime);
     k.size.set(key.limit());
     k.data.set(new ByteBufferMemoryIO(runtime, key));
@@ -89,12 +93,12 @@ public class Database {
   }
   
   public long crc(Transaction tx) {
-    Pointer cursorPtr = Memory.allocate(runtime, ADDRESS);
+    Pointer cursorPtr = Memory.allocateDirect(runtime, ADDRESS);
     checkRc(lib.mdb_cursor_open(tx.ptr, dbi, cursorPtr));
     final Pointer cursor = cursorPtr.getPointer(0);
 
-    final Pointer k = Memory.allocate(runtime, mdbValSize);
-    final Pointer v = Memory.allocate(runtime, mdbValSize);
+    final Pointer k = Memory.allocateDirect(runtime, mdbValSize);
+    final Pointer v = Memory.allocateDirect(runtime, mdbValSize);
 
     final CRC32 crc32 = new CRC32();
     while (lib.mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {

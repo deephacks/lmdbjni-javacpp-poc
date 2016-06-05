@@ -12,7 +12,7 @@ public class Transaction {
   final Pointer ptr;
 
   Transaction(Env env) {
-    Pointer txnPtr = Memory.allocate(runtime, ADDRESS);
+    Pointer txnPtr = Memory.allocateDirect(runtime, ADDRESS);
     checkRc(lib.mdb_txn_begin(env.ptr, null, 0, txnPtr));
     ptr = txnPtr.getPointer(0);
   }
