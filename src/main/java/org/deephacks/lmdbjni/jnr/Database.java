@@ -45,7 +45,7 @@ public class Database {
 
   public ByteBuffer get(Transaction tx, ByteBuffer key) {
     assert key.isDirect();
-    
+
     final MDB_val k = new MDB_val(runtime);
     k.size.set(key.limit());
     k.data.set(new ByteBufferMemoryIO(runtime, key));
@@ -81,29 +81,28 @@ public class Database {
   final ByteBuffer valBb = allocateDirect(0);
   final int mdbValSize = Long.BYTES + Long.BYTES;
 
-  public static long wrap(ByteBuffer buffer, Pointer mdbVal) {
+  private static long wrap(ByteBuffer buffer, MDB_val mdbVal) {
     // struct MDB_val { size_t mv_size; void *mv_data; }
-    // next line won't work as impl returns 0. so no unsafe-accelerated path...
-    //final long addr = mdbVal.address();
-    //assert addr != 0;
-    final long size = mdbVal.getLong(0);
-    final long data = mdbVal.getAddress(Long.BYTES);
+    final long size = mdbVal.size.get();
+    final long data = mdbVal.data.get().address();
     MemoryAccess.wrap(buffer, data, (int) size);
     return size;
   }
-  
+
   public long crc(Transaction tx) {
     Pointer cursorPtr = Memory.allocateDirect(runtime, ADDRESS);
     checkRc(lib.mdb_cursor_open(tx.ptr, dbi, cursorPtr));
     final Pointer cursor = cursorPtr.getPointer(0);
 
-    final Pointer k = Memory.allocateDirect(runtime, mdbValSize);
-    final Pointer v = Memory.allocateDirect(runtime, mdbValSize);
+    final MDB_val k = new MDB_val(runtime);
+    final MDB_val v = new MDB_val(runtime);
 
     final CRC32 crc32 = new CRC32();
     while (lib.mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
-      final long kSize = wrap(keyBb,  k);
-      final long vSize = wrap(valBb,  v);
+      assert MDB_val.isDirect(k);
+      assert MDB_val.isDirect(v);
+      final long kSize = wrap(keyBb, k);
+      final long vSize = wrap(valBb, v);
       assert kSize > 0;
       assert vSize > 0;
       crc32.update(keyBb);
