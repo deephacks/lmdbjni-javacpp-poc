@@ -25,7 +25,7 @@ public abstract class MemoryAccess {
     }
   }
 
-  public static long wrap(ByteBuffer buffer, MDB_val val) {
+  public static long wrap(final ByteBuffer buffer, final MDB_val val) {
     // struct MDB_val { size_t mv_size; void *mv_data; }
     final long size = UNSAFE.getLong(val.address());
     final long data = UNSAFE.getLong(val.address() + Long.BYTES);
@@ -33,7 +33,7 @@ public abstract class MemoryAccess {
     return size;
   }
 
-  public static void wrap(ByteBuffer buffer, long address, int capacity) {
+  public static void wrap(final ByteBuffer buffer, final long address, final int capacity) {
     UNSAFE.putLong(buffer, ADDRESS, address);
     UNSAFE.putInt(buffer, CAPACITY, capacity);
     buffer.clear();

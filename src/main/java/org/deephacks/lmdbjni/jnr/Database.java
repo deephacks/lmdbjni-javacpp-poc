@@ -5,10 +5,9 @@ import java.nio.ByteBuffer;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import java.util.zip.CRC32;
-import jnr.ffi.Memory;
-import static jnr.ffi.NativeType.ADDRESS;
-import static jnr.ffi.NativeType.UINT;
 import jnr.ffi.Pointer;
+import jnr.ffi.byref.IntByReference;
+import jnr.ffi.byref.PointerByReference;
 import jnr.ffi.provider.jffi.ByteBufferMemoryIO;
 import org.deephacks.lmdbjni.MemoryAccess;
 import static org.deephacks.lmdbjni.jnr.Library.MDB_CREATE;
@@ -23,9 +22,9 @@ public class Database {
   final int dbi;
 
   Database(Transaction tx, String name) {
-    Pointer dbiPtr = Memory.allocateDirect(runtime, UINT);
+    IntByReference dbiPtr = new IntByReference();
     checkRc(lib.mdb_dbi_open(tx.ptr, name, MDB_CREATE, dbiPtr));
-    dbi = dbiPtr.getInt(0);
+    dbi = dbiPtr.intValue();
   }
 
   public void put(Transaction tx, ByteBuffer key, ByteBuffer val) {
@@ -81,26 +80,24 @@ public class Database {
   final ByteBuffer valBb = allocateDirect(0);
   final int mdbValSize = Long.BYTES + Long.BYTES;
 
-  private static long wrap(ByteBuffer buffer, MDB_val mdbVal) {
-    // struct MDB_val { size_t mv_size; void *mv_data; }
+  private static long wrap(final ByteBuffer buffer, final MDB_val mdbVal) {
     final long size = mdbVal.size.get();
     final long data = mdbVal.data.get().address();
+    // no perf gain: final long data = mdbVal.data.longValue();
     MemoryAccess.wrap(buffer, data, (int) size);
     return size;
   }
 
   public long crc(Transaction tx) {
-    Pointer cursorPtr = Memory.allocateDirect(runtime, ADDRESS);
+    PointerByReference cursorPtr = new PointerByReference();
     checkRc(lib.mdb_cursor_open(tx.ptr, dbi, cursorPtr));
-    final Pointer cursor = cursorPtr.getPointer(0);
+    final Pointer cursor = cursorPtr.getValue();
 
     final MDB_val k = new MDB_val(runtime);
     final MDB_val v = new MDB_val(runtime);
 
     final CRC32 crc32 = new CRC32();
     while (lib.mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
-      assert MDB_val.isDirect(k);
-      assert MDB_val.isDirect(v);
       final long kSize = wrap(keyBb, k);
       final long vSize = wrap(valBb, v);
       assert kSize > 0;

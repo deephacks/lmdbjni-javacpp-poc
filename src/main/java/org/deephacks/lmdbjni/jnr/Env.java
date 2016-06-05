@@ -3,6 +3,7 @@ package org.deephacks.lmdbjni.jnr;
 import jnr.ffi.Memory;
 import static jnr.ffi.NativeType.ADDRESS;
 import jnr.ffi.Pointer;
+import jnr.ffi.byref.PointerByReference;
 import static org.deephacks.lmdbjni.jnr.Library.MDB_WRITEMAP;
 import static org.deephacks.lmdbjni.jnr.Library.lib;
 import static org.deephacks.lmdbjni.jnr.Library.runtime;
@@ -13,10 +14,10 @@ public class Env {
   final Pointer ptr;
   
   public Env(String path, long size) {
-    Pointer envPtr = Memory.allocateDirect(runtime, ADDRESS);
+    PointerByReference envPtr = new PointerByReference();
     checkRc(lib.mdb_env_create(envPtr));
 
-    ptr = envPtr.getPointer(0);
+    ptr = envPtr.getValue();
     
     checkRc(lib.mdb_env_set_maxreaders(ptr, 1));
     checkRc(lib.mdb_env_set_mapsize(ptr, size));
