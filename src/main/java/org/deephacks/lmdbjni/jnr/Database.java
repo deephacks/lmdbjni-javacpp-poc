@@ -11,6 +11,7 @@ import static jnr.ffi.NativeType.UINT;
 import jnr.ffi.Pointer;
 import jnr.ffi.provider.jffi.ByteBufferMemoryIO;
 import org.deephacks.lmdbjni.MemoryAccess;
+import static org.deephacks.lmdbjni.MemoryAccess.UNSAFE;
 import static org.deephacks.lmdbjni.jnr.Library.MDB_CREATE;
 import static org.deephacks.lmdbjni.jnr.Library.MDB_NEXT;
 import org.deephacks.lmdbjni.jnr.Library.MDB_val;
@@ -72,25 +73,35 @@ public class Database {
     }
   }
 
-  final ByteBuffer keyBb = allocateDirect(1);
-  final ByteBuffer valBb = allocateDirect(1);
+  final ByteBuffer keyBb = allocateDirect(0);
+  final ByteBuffer valBb = allocateDirect(0);
+  final int mdbValSize = Long.BYTES + Long.BYTES;
 
+  public static long wrap(ByteBuffer buffer, Pointer mdbVal) {
+    // struct MDB_val { size_t mv_size; void *mv_data; }
+    // next line won't work as impl returns 0. so no unsafe-accelerated path...
+    //final long addr = mdbVal.address();
+    //assert addr != 0;
+    final long size = mdbVal.getLong(0);
+    final long data = mdbVal.getAddress(Long.BYTES);
+    MemoryAccess.wrap(buffer, data, (int) size);
+    return size;
+  }
+  
   public long crc(Transaction tx) {
     Pointer cursorPtr = Memory.allocate(runtime, ADDRESS);
     checkRc(lib.mdb_cursor_open(tx.ptr, dbi, cursorPtr));
     final Pointer cursor = cursorPtr.getPointer(0);
 
-    final MDB_val k = new MDB_val(runtime);
-    final MDB_val v = new MDB_val(runtime);
+    final Pointer k = Memory.allocate(runtime, mdbValSize);
+    final Pointer v = Memory.allocate(runtime, mdbValSize);
 
     final CRC32 crc32 = new CRC32();
     while (lib.mdb_cursor_get(cursor, k, v, MDB_NEXT) == 0) {
-      assert k.size.get() > 0;
-      assert v.size.get() > 0;
-
-      MemoryAccess.wrap(keyBb, k.data.get().address(), (int) k.size.get());
-      MemoryAccess.wrap(valBb, v.data.get().address(), (int) v.size.get());
-
+      final long kSize = wrap(keyBb,  k);
+      final long vSize = wrap(valBb,  v);
+      assert kSize > 0;
+      assert vSize > 0;
       crc32.update(keyBb);
       crc32.update(valBb);
     }

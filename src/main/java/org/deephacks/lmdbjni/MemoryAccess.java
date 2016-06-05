@@ -9,7 +9,7 @@ import org.deephacks.lmdbjni.LMDB.MDB_val;
 
 public abstract class MemoryAccess {
 
-  private static final sun.misc.Unsafe UNSAFE;
+  public static final sun.misc.Unsafe UNSAFE;
   private static final long ADDRESS;
   private static final long CAPACITY;
 
